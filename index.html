@@ -1135,7 +1135,17 @@ Giải thích: Đơn vị đo độ dài trong hệ SI là mét (m).</pre>
         }
       }
     }
-
+let mathTimer = null;
+const mathObserver = new MutationObserver(() => {
+  clearTimeout(mathTimer);
+  mathTimer = setTimeout(() => {
+    renderMathSafe(document.body);
+  }, 120);
+});
+window.addEventListener("DOMContentLoaded", () => {
+  mathObserver.observe(document.body, { childList: true, subtree: true });
+  renderMathSafe(document.body);
+});
     // =========================================================================
     // MERGE BASE CURRICULUM + FIRESTORE CLOUD DATA
     // =========================================================================
