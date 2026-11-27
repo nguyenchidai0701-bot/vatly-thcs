@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Học Tốt Vật Lý THCS - Kết nối tri thức với cuộc sống | Nguyễn Chí Đại</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Be Vietnam Pro & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- KaTeX for Math & Physics Formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Mammoth.js for reading Word (.docx) files directly in browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .katex {
+      font-size: 1.08em;
+    }
+    .katex-display {
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .sim-canvas {
+      width: 100%;
+      height: 280px;
+      background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+      border-radius: 0.75rem;
+      border: 1px solid #dbeafe;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Brand & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center border border-white/20 shadow-inner shrink-0">
+            <i data-lucide="atom" class="w-6 h-6 text-cyan-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-lg sm:text-xl font-extrabold tracking-tight leading-tight">
+                HỌC TỐT VẬT LÝ THCS
+              </h1>
+              <span class="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 border border-cyan-400/30">
+                Kết nối tri thức
+              </span>
+            </div>
+            <p class="text-xs text-blue-200 mt-0.5 flex items-center gap-2 flex-wrap">
+              <span>Chương trình KHTN Lớp 6 – 9</span>
+              <span>•</span>
+              <span class="font-semibold text-amber-300 flex items-center gap-1">
+                <i data-lucide="award" class="w-3.5 h-3.5"></i> Tác giả: Nguyễn Chí Đại
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Controls: Student Badge & Teacher Portal Button -->
+        <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+          <!-- Active Student Info Pill -->
+          <button id="header-student-btn" onclick="openStudentInfoModal()" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs transition">
+            <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
+            <span id="header-student-text" class="font-medium text-blue-50">Chưa nhập tên HS</span>
+          </button>
+
+          <!-- Teacher Portal Button -->
+          <button id="teacher-portal-btn" onclick="handleTeacherPortalClick()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm shadow-md transition cursor-pointer">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span id="teacher-portal-label">Cổng Giáo Viên</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grade Selector Tabs -->
+      <div class="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between gap-2 overflow-x-auto">
+        <div class="flex items-center gap-1.5 sm:gap-2" id="grade-tabs">
+          <button onclick="selectGrade(6)" data-grade="6" class="grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap">Vật Lý 6</button>
+          <button onclick="selectGrade(7)" data-grade="7" class="grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap">Vật Lý 7</button>
+          <button onclick="selectGrade(8)" data-grade="8" class="grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap">Vật Lý 8</button>
+          <button onclick="selectGrade(9)" data-grade="9" class="grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap">Vật Lý 9</button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-blue-200 shrink-0">
+          <span id="firebase-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="firebase-status-text" class="hidden md:inline">Đang đồng bộ đám mây</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Student Mode View -->
+    <div id="student-view" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left Sidebar: Chapter & Lesson List -->
+      <aside class="lg:col-span-4 xl:col-span-3 space-y-4">
+        <!-- Mobile Student Info Card -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Học sinh đang học</p>
+            <p id="sidebar-student-name" class="text-sm font-bold text-slate-800 truncate">Chưa khai báo họ tên</p>
+            <p id="sidebar-student-class" class="text-xs text-blue-600 font-medium">Bấm nút bên cạnh để nhập</p>
+          </div>
+          <button onclick="openStudentInfoModal()" class="px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs shrink-0 transition">
+            Đổi tên/Lớp
+          </button>
+        </div>
+
+        <!-- Lessons Navigation Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <h2 id="sidebar-grade-title" class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i>
+              <span>Danh mục bài học Lớp 6</span>
+            </h2>
+            <span id="lesson-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">0 bài</span>
+          </div>
+          <div id="chapter-list" class="p-3 space-y-3 max-h-[65vh] overflow-y-auto">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Main Content: Lesson Details, Simulation, Quiz, Essay -->
+      <section class="lg:col-span-8 xl:col-span-9 space-y-6">
+        <!-- Lesson Header Banner -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <span id="lesson-chapter-tag" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
+              Chương I
+            </span>
+            <span id="lesson-author-tag" class="text-xs font-medium text-slate-500 flex items-center gap-1">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i> Biên soạn: Nguyễn Chí Đại
+            </span>
+          </div>
+          <h2 id="lesson-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
+            Đang tải bài học...
+          </h2>
+
+          <!-- Lesson Sub-tabs -->
+          <div class="mt-5 flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+            <button onclick="switchLessonTab('theory')" id="tab-btn-theory" class="lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition">
+              <i data-lucide="file-text" class="w-4 h-4"></i> Lý thuyết trọng tâm
+            </button>
+            <button onclick="switchLessonTab('simulation')" id="tab-btn-simulation" class="lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition">
+              <i data-lucide="sliders" class="w-4 h-4"></i> Thí nghiệm mô phỏng
+            </button>
+            <button onclick="switchLessonTab('quiz')" id="tab-btn-quiz" class="lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i> Trắc nghiệm luyện tập
+              <span id="quiz-count-pill" class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">0</span>
+            </button>
+            <button onclick="switchLessonTab('essay')" id="tab-btn-essay" class="lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition">
+              <i data-lucide="pen-tool" class="w-4 h-4"></i> Tự luận vận dụng
+            </button>
+          </div>
+
+          <!-- Tab Content: Theory -->
+          <div id="content-theory" class="mt-5 space-y-4">
+            <div id="theory-body" class="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-3">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Tab Content: Interactive Simulation -->
+          <div id="content-simulation" class="mt-5 hidden space-y-4">
+            <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4">
+              <h3 id="sim-title" class="font-bold text-blue-950 text-base flex items-center gap-2">
+                <i data-lucide="flask-conical" class="w-5 h-5 text-blue-600"></i>
+                <span>Thí nghiệm tương tác</span>
+              </h3>
+              <p id="sim-desc" class="text-xs sm:text-sm text-blue-800 mt-1">
+                Kéo các thanh trượt bên dưới để thay đổi đại lượng vật lý và quan sát hiện tượng trực quan.
+              </p>
+            </div>
+
+            <div class="relative">
+              <canvas id="physics-canvas" class="sim-canvas"></canvas>
+            </div>
+
+            <div id="sim-controls" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <!-- Dynamic sliders -->
+            </div>
+
+            <div id="sim-readout" class="p-4 rounded-xl bg-slate-900 text-cyan-300 font-mono text-sm flex flex-wrap items-center justify-between gap-2">
+              <!-- Live measurement readout -->
+            </div>
+          </div>
+
+          <!-- Tab Content: Multiple Choice Quiz -->
+          <div id="content-quiz" class="mt-5 hidden space-y-5">
+            <!-- Student Identity Gate Banner -->
+            <div id="quiz-student-banner" class="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <i data-lucide="id-card" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-900 text-sm">Thông tin học sinh làm bài</h4>
+                  <p id="quiz-identity-status" class="text-xs text-slate-600 mt-0.5">
+                    Vui lòng nhập Họ tên và Lớp trước khi nộp bài để hệ thống ghi nhận kết quả.
+                  </p>
+                </div>
+              </div>
+              <button onclick="openStudentInfoModal()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition shrink-0">
+                Nhập / Sửa Họ tên & Lớp
+              </button>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="quiz-questions-container" class="space-y-4">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Submit & Result Box -->
+            <div id="quiz-actions" class="pt-2 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200">
+              <button id="btn-submit-quiz" onclick="submitQuiz()" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md flex items-center gap-2 transition">
+                <i data-lucide="send" class="w-4 h-4"></i> Nộp bài & Chấm điểm
+              </button>
+              <button id="btn-reset-quiz" onclick="resetQuiz()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition hidden">
+                Làm lại bài này
+              </button>
+            </div>
+
+            <div id="quiz-result-summary" class="hidden p-5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+              <!-- Populated after submission -->
+            </div>
+          </div>
+
+          <!-- Tab Content: Essay Questions -->
+          <div id="content-essay" class="mt-5 hidden space-y-4">
+            <div id="essay-container" class="space-y-4">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Teacher Dashboard View (Hidden unless authenticated via Firebase Auth) -->
+    <div id="teacher-dashboard-view" class="hidden space-y-6">
+      <!-- Teacher Top Bar -->
+      <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg sm:text-xl font-extrabold">Bảng Điều Khiển Tổ Chuyên Môn</h2>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Đã xác thực</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
+              Tài khoản giáo viên: <span id="teacher-logged-email" class="font-bold text-amber-300">...</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <button onclick="exitTeacherDashboard()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm transition flex items-center gap-1.5">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Về trang Học sinh
+          </button>
+          <button onclick="logoutTeacher()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm transition flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
+          </button>
+        </div>
+      </div>
+
+      <!-- Teacher Navigation Tabs -->
+      <div class="bg-white rounded-2xl p-2 shadow-sm border border-slate-200 flex flex-wrap gap-2">
+        <button onclick="switchTeacherTab('upload')" id="t-tab-upload" class="teacher-tab flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition">
+          <i data-lucide="file-up" class="w-4 h-4"></i> Tải đề & Lý thuyết từ Word (.docx)
+        </button>
+        <button onclick="switchTeacherTab('manage')" id="t-tab-manage" class="teacher-tab flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition">
+          <i data-lucide="folder-kanban" class="w-4 h-4"></i> Quản lý Nội dung đã đăng
+        </button>
+        <button onclick="switchTeacherTab('stats')" id="t-tab-stats" class="teacher-tab flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Thống kê & Kết quả Học sinh
+        </button>
+      </div>
+
+      <!-- TEACHER TAB 1: UPLOAD FROM WORD (.DOCX) -->
+      <div id="teacher-panel-upload" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+            <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-600"></i>
+            <span>Cấu hình tải lên từ Word (.docx)</span>
+          </h3>
+
+          <!-- Upload Mode Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">1. Chọn loại nội dung muốn đăng:</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="setUploadMode('mcq')" id="mode-btn-mcq" class="p-2.5 rounded-xl border text-xs font-bold text-center transition">
+                Thêm Trắc nghiệm vào bài
+              </button>
+              <button type="button" onclick="setUploadMode('lesson')" id="mode-btn-lesson" class="p-2.5 rounded-xl border text-xs font-bold text-center transition">
+                Tạo Bài học / Lý thuyết mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Grade Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">2. Chọn Khối lớp:</label>
+            <select id="upload-grade" onchange="populateUploadLessonDropdown()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="6">Vật Lý Lớp 6</option>
+              <option value="7">Vật Lý Lớp 7</option>
+              <option value="8">Vật Lý Lớp 8</option>
+              <option value="9">Vật Lý Lớp 9</option>
+            </select>
+          </div>
+
+          <!-- Target Lesson Selector (for MCQ mode) -->
+          <div id="upload-existing-lesson-box">
+            <label class="block text-xs font-bold text-slate-700 mb-1">3. Chọn Bài học cần bổ sung câu hỏi:</label>
+            <select id="upload-lesson-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <!-- New Lesson Fields (for Lesson mode) -->
+          <div id="upload-new-lesson-box" class="hidden space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tên Chương (VD: Chương I. Mở đầu):</label>
+              <input type="text" id="new-lesson-chapter" placeholder="Nhập tên chương..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tên Bài học mới:</label>
+              <input type="text" id="new-lesson-title" placeholder="VD: Bài 5. Đo khối lượng..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+            </div>
+          </div>
+
+          <!-- Word File Input -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">4. Chọn tệp Microsoft Word (.docx):</label>
+            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-blue-300 rounded-2xl bg-blue-50/50 hover:bg-blue-50 cursor-pointer transition p-4 text-center">
+              <i data-lucide="file-text" class="w-8 h-8 text-blue-600 mb-1.5"></i>
+              <span id="word-file-name" class="text-xs font-bold text-blue-900">Bấm để chọn file .docx từ máy tính</span>
+              <span class="text-[11px] text-slate-500 mt-0.5">Hỗ trợ tự động bóc tách Câu hỏi, A/B/C/D, Đáp án, Giải thích</span>
+              <input type="file" id="word-file-input" accept=".docx" onchange="handleWordFileUpload(event)" class="hidden" />
+            </label>
+          </div>
+
+          <!-- Sample Template Helper -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">Quy ước soạn file Word chuẩn:</span>
+              <button type="button" onclick="toggleWordTemplateModal()" class="text-xs font-bold text-blue-600 hover:underline">Xem mẫu chi tiết</button>
+            </div>
+            <pre class="text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200 overflow-x-auto leading-relaxed">Câu 1: Đơn vị đo độ dài hợp pháp ở Việt Nam là gì?
+A. Mét (m)
+B. Kilôgam (kg)
+C. Giây (s)
+D. Lít (l)
+Đáp án: A
+Giải thích: Đơn vị đo độ dài trong hệ SI là mét (m).</pre>
+          </div>
+        </div>
+
+        <!-- Preview & Save Panel -->
+        <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                <i data-lucide="eye" class="w-5 h-5 text-emerald-600"></i>
+                <span>Xem trước nội dung bóc tách từ Word</span>
+              </h3>
+              <span id="parsed-count-badge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">Chưa tải file</span>
+            </div>
+
+            <div id="word-preview-area" class="mt-4 max-h-[430px] overflow-y-auto space-y-3 text-sm text-slate-600">
+              <div class="py-16 text-center text-slate-400">
+                <i data-lucide="file-search" class="w-12 h-12 mx-auto mb-2 opacity-40"></i>
+                <p class="font-medium">Chọn một tệp Word (.docx) ở cột bên trái để xem trước nội dung tại đây.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button type="button" onclick="clearWordPreview()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">
+              Xóa nháp
+            </button>
+            <button type="button" id="btn-publish-word" onclick="saveParsedContentToFirestore()" disabled class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-sm shadow-md flex items-center gap-2 transition">
+              <i data-lucide="cloud-upload" class="w-4 h-4"></i> Lưu lên hệ thống cho Học sinh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER TAB 2: MANAGE CLOUD CONTENT -->
+      <div id="teacher-panel-manage" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Custom Lessons List -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                <i data-lucide="book-plus" class="w-5 h-5 text-blue-600"></i>
+                <span>Bài học mới giáo viên đã đăng</span>
+              </h3>
+              <span id="cloud-lessons-count" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">0</span>
+            </div>
+            <div id="cloud-lessons-list" class="space-y-3 max-h-[450px] overflow-y-auto">
+              <p class="text-xs text-slate-400 text-center py-8">Chưa có bài học bổ sung nào trên đám mây.</p>
+            </div>
+          </div>
+
+          <!-- Custom MCQs List -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                <i data-lucide="list-checks" class="w-5 h-5 text-emerald-600"></i>
+                <span>Câu hỏi trắc nghiệm đã bổ sung</span>
+              </h3>
+              <span id="cloud-mcqs-count" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">0</span>
+            </div>
+            <div id="cloud-mcqs-list" class="space-y-3 max-h-[450px] overflow-y-auto">
+              <p class="text-xs text-slate-400 text-center py-8">Chưa có câu hỏi bổ sung nào trên đám mây.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEACHER TAB 3: STUDENT SUBMISSIONS & CLASS ANALYTICS -->
+      <div id="teacher-panel-stats" class="hidden space-y-6">
+        <!-- Filters Bar -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Lọc theo Khối lớp:</label>
+              <select id="stats-filter-grade" onchange="renderSubmissionsAnalytics()" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-medium">
+                <option value="all">Tất cả các khối (6–9)</option>
+                <option value="6">Khối 6</option>
+                <option value="7">Khối 7</option>
+                <option value="8">Khối 8</option>
+                <option value="9">Khối 9</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Lọc theo Lớp học cụ thể:</label>
+              <select id="stats-filter-class" onchange="renderSubmissionsAnalytics()" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-medium">
+                <option value="all">Tất cả các lớp</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Lọc theo Bài học:</label>
+              <select id="stats-filter-lesson" onchange="renderSubmissionsAnalytics()" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-medium">
+                <option value="all">Tất cả các bài học</option>
+              </select>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="exportSubmissionsCSV()" class="w-full px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition">
+                <i data-lucide="download" class="w-4 h-4"></i> Xuất Excel (.CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-500">Tổng lượt học sinh nộp bài</p>
+              <p id="stat-total-submissions" class="text-2xl font-extrabold text-slate-900 mt-0.5">0</p>
+              <p id="stat-unique-students" class="text-[11px] text-blue-600 font-medium">0 học sinh khác nhau</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+              <i data-lucide="award" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-500">Điểm trung bình (Thang 10)</p>
+              <p id="stat-avg-score" class="text-2xl font-extrabold text-slate-900 mt-0.5">0.0</p>
+              <p class="text-[11px] text-slate-400">Tính trên bộ lọc hiện tại</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <i data-lucide="trending-up" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-500">Tỷ lệ đạt yêu cầu (&ge; 5.0 điểm)</p>
+              <p id="stat-pass-rate" class="text-2xl font-extrabold text-emerald-600 mt-0.5">0%</p>
+              <p class="text-[11px] text-slate-400">Tự động cập nhật thời gian thực</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Submissions Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="font-extrabold text-slate-900 text-base">Bảng điểm chi tiết học sinh</h3>
+            <button onclick="fetchSubmissionsForTeacher()" class="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới dữ liệu
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
+                  <th class="py-3 px-4">STT</th>
+                  <th class="py-3 px-4">Họ và tên học sinh</th>
+                  <th class="py-3 px-4">Lớp</th>
+                  <th class="py-3 px-4">Bài học</th>
+                  <th class="py-3 px-4">Số câu đúng</th>
+                  <th class="py-3 px-4">Điểm (10)</th>
+                  <th class="py-3 px-4">Thời gian nộp</th>
+                </tr>
+              </thead>
+              <tbody id="submissions-table-body" class="divide-y divide-slate-100 text-sm">
+                <tr>
+                  <td colspan="7" class="py-10 text-center text-slate-400">Đang tải dữ liệu bài nộp...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="text-center sm:text-left">
+        <p class="font-bold text-slate-800 text-sm">Học Tốt Vật Lý THCS — Chương trình KHTN (Kết nối tri thức với cuộc sống)</p>
+        <p class="mt-1">Tác giả & Quản trị chuyên môn: <strong class="text-blue-700">Thầy Nguyễn Chí Đại</strong> • Hệ thống hỗ trợ học tập và kiểm tra trực tuyến.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 font-medium">Lớp 6 • Lớp 7 • Lớp 8 • Lớp 9</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL 1: STUDENT NAME & CLASS INPUT (Required before quiz submission) -->
+  <div id="student-info-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-base">Thông tin Học sinh</h3>
+            <p class="text-xs text-slate-500">Không cần tạo tài khoản • Chỉ cần nhập tên & lớp</p>
+          </div>
+        </div>
+        <button onclick="closeStudentInfoModal()" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên đầy đủ của em <span class="text-rose-500">*</span></label>
+          <input type="text" id="modal-student-name" placeholder="Ví dụ: Nguyễn Văn An" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Lớp học <span class="text-rose-500">*</span></label>
+          <input type="text" id="modal-student-class" placeholder="Ví dụ: 6A1, 7A2, 8A1, 9A3..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium uppercase focus:ring-2 focus:ring-blue-500 outline-none" />
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <span class="text-[11px] text-slate-400 self-center mr-1">Chọn nhanh:</span>
+            <button type="button" onclick="quickSetClass('6A1')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-xs font-semibold text-slate-700">6A1</button>
+            <button type="button" onclick="quickSetClass('6A2')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-xs font-semibold text-slate-700">6A2</button>
+            <button type="button" onclick="quickSetClass('7A1')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-xs font-semibold text-slate-700">7A1</button>
+            <button type="button" onclick="quickSetClass('8A1')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-xs font-semibold text-slate-700">8A1</button>
+            <button type="button" onclick="quickSetClass('9A1')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-xs font-semibold text-slate-700">9A1</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button type="button" onclick="closeStudentInfoModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Đóng</button>
+        <button type="button" onclick="saveStudentIdentity()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm">Lưu thông tin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: TEACHER LOGIN ONLY (No public sign-up) -->
+  <div id="teacher-login-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+            <i data-lucide="lock" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-base">Đăng nhập Cổng Giáo Viên</h3>
+            <p class="text-xs text-slate-500">Chỉ dành cho giáo viên trong tổ chuyên môn</p>
+          </div>
+        </div>
+        <button onclick="closeTeacherLoginModal()" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+        <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 mt-0.5 text-amber-600"></i>
+        <span>Khu vực được bảo mật bằng Firebase Authentication. Học sinh vui lòng đóng hộp thoại này và tiếp tục học trực tiếp không cần đăng nhập.</span>
+      </div>
+
+      <form onsubmit="submitTeacherLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email giáo viên</label>
+          <input type="email" id="teacher-email-input" required placeholder="giaovien@truong.edu.vn" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Mật khẩu</label>
+          <input type="password" id="teacher-password-input" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500 outline-none" />
+        </div>
+        <p id="teacher-login-error" class="text-xs font-semibold text-rose-600 hidden"></p>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeTeacherLoginModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Hủy</button>
+          <button type="submit" id="btn-teacher-login-submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-4 h-4"></i> Đăng nhập hệ thống
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: WORD FORMAT GUIDE -->
+  <div id="word-guide-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-extrabold text-slate-900 text-base">Hướng dẫn soạn file Word (.docx) chuẩn</h3>
+        <button onclick="toggleWordTemplateModal()" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="text-xs text-slate-600 space-y-2.5 leading-relaxed">
+        <p><strong>1. Đối với file Trắc nghiệm:</strong> Mỗi câu hỏi bắt đầu bằng chữ <code>Câu 1:</code>, <code>Câu 2:</code>... Tiếp theo là 4 dòng đáp án <code>A.</code>, <code>B.</code>, <code>C.</code>, <code>D.</code> và dòng chốt <code>Đáp án: A</code> (hoặc B, C, D). Có thể thêm dòng <code>Giải thích: ...</code> ở dưới.</p>
+        <p><strong>2. Công thức Toán / Vật lý:</strong> Thầy/cô có thể gõ công thức LaTeX trong cặp dấu <code>$...$</code> (ví dụ: <code>$v = \frac{s}{t}$</code>, <code>$10\text{ m/s}$</code>), trang web sẽ tự động hiển thị sắc nét.</p>
+        <p><strong>3. Đối với file Lý thuyết bài học mới:</strong> Chỉ cần soạn các đề mục I, II, III và nội dung tóm tắt như giáo án thông thường trên Word, hệ thống sẽ tự định dạng thành trang lý thuyết.</p>
+      </div>
+      <div class="flex justify-end">
+        <button onclick="toggleWordTemplateModal()" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Modular SDK v10.12.2 & Application Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      serverTimestamp,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Your Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFT4mrmuAi-eqDHb6aY3oGkmC70m4xdy8",
+      authDomain: "tu-nhien.firebaseapp.com",
+      projectId: "tu-nhien",
+      storageBucket: "tu-nhien.firebasestorage.app",
+      messagingSenderId: "364375541662",
+      appId: "1:364375541662:web:b7fd09cb073df5abb4b88f",
+      measurementId: "G-LZCK2B4YD4"
+    };
+
+    // Initialize Firebase Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // =========================================================================
+    // BASE CURRICULUM DATA (KHTN Vật Lý 6, 7, 8, 9 - Kết nối tri thức)
+    // =========================================================================
+    const BASE_CURRICULUM = [
+      // -------------------- LỚP 6 --------------------
+      {
+        id: "ly6-b1",
+        grade: 6,
+        chapter: "Chương I. Mở đầu & Các phép đo",
+        title: "Bài 4 & 5: Đo chiều dài, đo khối lượng và đo thời gian",
+        author: "Nguyễn Chí Đại",
+        simType: "ruler",
+        simTitle: "Thí nghiệm ảo: Đo chiều dài vật bằng thước chia độ",
+        simDesc: "Kéo thanh trượt để thay đổi chiều dài thanh gỗ và quan sát cách đọc kết quả trên thước đo (ĐCNN = 0,1 cm).",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Đơn vị đo cơ bản trong hệ SI</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li><strong>Đo chiều dài:</strong> Đơn vị chuẩn là mét (ký hiệu: $\\text{m}$). Các ước và bội thường dùng: $\\text{mm}, \\text{cm}, \\text{dm}, \\text{km}$ ($1\\text{ m} = 100\\text{ cm} = 1000\\text{ mm}$; $1\\text{ km} = 1000\\text{ m}$).</li>
+              <li><strong>Đo khối lượng:</strong> Đơn vị chuẩn là kilôgam (ký hiệu: $\\text{kg}$). Ngoài ra có: $\\text{g}, \\text{mg}, \\text{yến}, \\text{tạ}, \\text{tấn}$ ($1\\text{ tấn} = 1000\\text{ kg}$; $1\\text{ kg} = 1000\\text{ g}$).</li>
+              <li><strong>Đo thời gian:</strong> Đơn vị chuẩn là giây (ký hiệu: $\\text{s}$). Các đơn vị khác: phút ($1\\text{ phút} = 60\\text{ s}$), giờ ($1\\text{ h} = 3600\\text{ s}$).</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Giới hạn đo (GHĐ) và Độ chia nhỏ nhất (ĐCNN)</h4>
+            <p class="text-sm"><strong>GHĐ</strong> là giá trị lớn nhất ghi trên dụng cụ đo. <strong>ĐCNN</strong> là giá trị giữa hai vạch chia liên tiếp trên dụng cụ đo. Khi đo cần đặt mắt nhìn vuông góc với vạch chia tại đầu vật cần đo.</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Đơn vị đo chiều dài hợp pháp trong hệ đo lường chính thức của nước ta là gì?",
+            options: ["Mét (m)", "Inch (in)", "Dặm (mile)", "Hải lý"],
+            ans: 0,
+            exp: "Đơn vị đo chiều dài chuẩn trong hệ SI và hợp pháp tại Việt Nam là mét (m)."
+          },
+          {
+            q: "Một thước thẳng có vạch chia từ $0\\text{ cm}$ đến $30\\text{ cm}$, giữa hai vạch $1\\text{ cm}$ và $2\\text{ cm}$ được chia thành $10$ khoảng bằng nhau. GHĐ và ĐCNN của thước là:",
+            options: ["$30\\text{ cm}$ và $1\\text{ mm}$", "$30\\text{ cm}$ và $1\\text{ cm}$", "$10\\text{ cm}$ và $1\\text{ mm}$", "$30\\text{ mm}$ và $0,1\\text{ cm}$"],
+            ans: 0,
+            exp: "Giá trị lớn nhất trên thước là $30\\text{ cm}$ (GHĐ). Mỗi khoảng nhỏ bằng $\\frac{1\\text{ cm}}{10} = 0,1\\text{ cm} = 1\\text{ mm}$ (ĐCNN)."
+          },
+          {
+            q: "Đổi đơn vị: $2,5\\text{ tấn}$ bằng bao nhiêu kilôgam?",
+            options: ["$250\\text{ kg}$", "$2500\\text{ kg}$", "$25000\\text{ kg}$", "$25\\text{ kg}$"],
+            ans: 1,
+            exp: "Vì $1\\text{ tấn} = 1000\\text{ kg}$ nên $2,5\\text{ tấn} = 2,5 \\cdot 1000 = 2500\\text{ kg}$."
+          }
+        ],
+        essays: [
+          {
+            q: "Nêu 5 bước cơ bản khi thực hiện phép đo chiều dài một vật bằng thước.",
+            guide: "Bước 1: Ước lượng chiều dài vật cần đo. Bước 2: Chọn thước có GHĐ và ĐCNN phù hợp. Bước 3: Đặt thước dọc theo chiều dài vật sao cho một đầu vật ngang bằng vạch số 0. Bước 4: Đặt mắt nhìn theo hướng vuông góc với cạnh thước ở đầu kia của vật. Bước 5: Đọc và ghi kết quả đo theo vạch chia gần nhất."
+          }
+        ]
+      },
+      {
+        id: "ly6-b2",
+        grade: 6,
+        chapter: "Chương IX. Lực",
+        title: "Bài 40 & 41: Lực là gì? Biểu diễn lực và Lực hấp dẫn",
+        author: "Nguyễn Chí Đại",
+        simType: "spring",
+        simTitle: "Thí nghiệm ảo: Độ giãn lò xo tỷ lệ với lực kéo (Lực kế)",
+        simDesc: "Thay đổi khối lượng quả nặng treo vào lò xo để quan sát trọng lực $P = 10 \\cdot m$ và độ biến dạng lò xo.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Tác dụng của lực và biểu diễn lực</h4>
+            <p class="text-sm">Tác dụng đẩy, kéo của vật này lên vật khác gọi là <strong>lực</strong> (ký hiệu $F$, đơn vị Niutơn: $\\text{N}$). Lực có thể làm biến đổi chuyển động hoặc làm biến dạng vật. Mỗi lực được biểu diễn bằng một mũi tên có: gốc là điểm đặt lực, hướng là hướng của lực, độ dài biểu diễn độ lớn theo tỉ xích.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Trọng lực và Trọng lượng</h4>
+            <p class="text-sm"><strong>Trọng lực</strong> là lực hút của Trái Đất tác dụng lên vật, có phương thẳng đứng và chiều hướng về phía Trái Đất. Độ lớn của trọng lực gọi là <strong>trọng lượng</strong> ($P$), liên hệ với khối lượng ($m$, đơn vị $\\text{kg}$) theo công thức: $$P = 10 \\cdot m$$</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Một túi đường có khối lượng $2,5\\text{ kg}$ đặt trên mặt bàn. Trọng lượng của túi đường gần bằng bao nhiêu?",
+            options: ["$2,5\\text{ N}$", "$25\\text{ N}$", "$250\\text{ N}$", "$0,25\\text{ N}$"],
+            ans: 1,
+            exp: "Áp dụng công thức $P = 10 \\cdot m = 10 \\cdot 2,5 = 25\\text{ N}$."
+          },
+          {
+            q: "Trọng lực tác dụng lên một vật đang rơi có đặc điểm nào sau đây?",
+            options: ["Phương ngang, chiều từ trái sang phải", "Phương thẳng đứng, chiều từ dưới lên trên", "Phương thẳng đứng, chiều hướng về tâm Trái Đất", "Phương xiên góc $45^\\circ$"],
+            ans: 2,
+            exp: "Trọng lực luôn có phương thẳng đứng và chiều hướng về phía Trái Đất (từ trên xuống dưới)."
+          }
+        ],
+        essays: [
+          {
+            q: "Một vật có trọng lượng $450\\text{ N}$. Tính khối lượng của vật đó ra đơn vị kilôgam và tạ.",
+            guide: "Từ công thức $P = 10 \\cdot m \\Rightarrow m = \\frac{P}{10} = \\frac{450}{10} = 45\\text{ kg} = 0,45\\text{ tạ}$."
+          }
+        ]
+      },
+
+      // -------------------- LỚP 7 --------------------
+      {
+        id: "ly7-b1",
+        grade: 7,
+        chapter: "Chương III. Tốc độ",
+        title: "Bài 8 & 9: Tốc độ chuyển động & Đồ thị quãng đường – thời gian",
+        author: "Nguyễn Chí Đại",
+        simType: "speed",
+        simTitle: "Thí nghiệm ảo: Chuyển động thẳng đều và Đồ thị s - t",
+        simDesc: "Điều chỉnh tốc độ $v$ và thời gian $t$ để quan sát xe di chuyển và quãng đường $s = v \\cdot t$ đi được.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Công thức tính tốc độ</h4>
+            <p class="text-sm">Tốc độ cho biết mức độ nhanh hay chậm của chuyển động, được xác định bằng quãng đường đi được trong một đơn vị thời gian:
+            $$v = \\frac{s}{t}$$
+            Trong đó: $s$ là quãng đường ($\\text{m}$ hoặc $\\text{km}$), $t$ là thời gian ($\\text{s}$ hoặc $\\text{h}$), $v$ là tốc độ ($\\text{m/s}$ hoặc $\\text{km/h}$).</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Đổi đơn vị tốc độ & Đồ thị quãng đường - thời gian</h4>
+            <p class="text-sm">Quy tắc đổi nhanh: $1\\text{ m/s} = 3,6\\text{ km/h}$ (muốn đổi từ $\\text{km/h}$ sang $\\text{m/s}$ ta chia cho $3,6$). Đồ thị quãng đường – thời gian của chuyển động thẳng đều là một đường thẳng đi qua gốc tọa độ.</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Một ô tô đi được quãng đường $120\\text{ km}$ trong thời gian $2\\text{ giờ}$. Tốc độ của ô tô là:",
+            options: ["$60\\text{ km/h}$", "$240\\text{ km/h}$", "$60\\text{ m/s}$", "$30\\text{ km/h}$"],
+            ans: 0,
+            exp: "Áp dụng công thức $v = \\frac{s}{t} = \\frac{120}{2} = 60\\text{ km/h}$."
+          },
+          {
+            q: "Tốc độ $54\\text{ km/h}$ tương ứng với giá trị nào tính theo đơn vị $\\text{m/s}$?",
+            options: ["$10\\text{ m/s}$", "$15\\text{ m/s}$", "$20\\text{ m/s}$", "$194,4\\text{ m/s}$"],
+            ans: 1,
+            exp: "Ta có $54\\text{ km/h} = \\frac{54}{3,6} = 15\\text{ m/s}$."
+          }
+        ],
+        essays: [
+          {
+            q: "Nhà bạn An cách trường $3,6\\text{ km}$. An đi xe đạp từ nhà lúc $6\\text{ giờ } 30\\text{ phút}$ với tốc độ trung bình $4\\text{ m/s}$. Hỏi An đến trường lúc mấy giờ?",
+            guide: "Đổi $s = 3,6\\text{ km} = 3600\\text{ m}$. Thời gian An đi từ nhà đến trường là: $t = \\frac{s}{v} = \\frac{3600}{4} = 900\\text{ s} = 15\\text{ phút}$. Vậy An đến trường lúc $6\\text{ giờ } 45\\text{ phút}$."
+          }
+        ]
+      },
+      {
+        id: "ly7-b2",
+        grade: 7,
+        chapter: "Chương V. Ánh sáng",
+        title: "Bài 15 & 16: Ánh sáng, tia sáng & Sự phản xạ ánh sáng",
+        author: "Nguyễn Chí Đại",
+        simType: "reflection",
+        simTitle: "Thí nghiệm ảo: Định luật phản xạ ánh sáng trên gương phẳng",
+        simDesc: "Thay đổi góc tới $i$ để quan sát tia phản xạ và kiểm chứng góc phản xạ $i' = i$.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Định luật phản xạ ánh sáng</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li>Tia phản xạ nằm trong mặt phẳng chứa tia tới và pháp tuyến của gương ở điểm tới.</li>
+              <li>Góc phản xạ bằng góc tới: $$i' = i$$</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Ảnh của vật tạo bởi gương phẳng</h4>
+            <p class="text-sm">Ảnh của một vật tạo bởi gương phẳng là <strong>ảnh ảo</strong> (không hứng được trên màn chắn), có độ lớn bằng vật và khoảng cách từ một điểm của vật đến gương phẳng bằng khoảng cách từ ảnh của điểm đó đến gương.</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Chiếu một tia sáng tới gương phẳng hợp với mặt gương một góc $35^\\circ$. Góc phản xạ bằng bao nhiêu?",
+            options: ["$35^\\circ$", "$55^\\circ$", "$70^\\circ$", "$90^\\circ$"],
+            ans: 1,
+            exp: "Pháp tuyến vuông góc với mặt gương ($90^\\circ$), nên góc tới $i = 90^\\circ - 35^\\circ = 55^\\circ$. Theo định luật phản xạ ánh sáng, góc phản xạ $i' = i = 55^\\circ$."
+          }
+        ],
+        essays: [
+          {
+            q: "Một người cao $1,65\\text{ m}$ đứng cách một gương phẳng treo thẳng đứng một khoảng $1,5\\text{ m}$. Hỏi ảnh của người đó cao bao nhiêu và cách người đó bao xa?",
+            guide: "Vì ảnh tạo bởi gương phẳng có độ lớn bằng vật nên ảnh cao $1,65\\text{ m}$. Ảnh cách gương $1,5\\text{ m}$, do đó khoảng cách từ người đó đến ảnh là $1,5 + 1,5 = 3,0\\text{ m}$."
+          }
+        ]
+      },
+
+      // -------------------- LỚP 8 --------------------
+      {
+        id: "ly8-b1",
+        grade: 8,
+        chapter: "Chương III. Khối lượng riêng và Áp suất",
+        title: "Bài 13, 14 & 15: Khối lượng riêng, Áp suất và Áp suất chất lỏng",
+        author: "Nguyễn Chí Đại",
+        simType: "pressure",
+        simTitle: "Thí nghiệm ảo: Áp suất chất lỏng theo độ sâu h và trọng lượng riêng d",
+        simDesc: "Thay đổi độ sâu $h$ của cảm biến trong chất lỏng để đo áp suất $p = d \\cdot h$.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Khối lượng riêng</h4>
+            <p class="text-sm">Khối lượng riêng ($D$) của một chất được xác định bằng khối lượng của một đơn vị thể tích chất đó:
+            $$D = \\frac{m}{V}$$
+            Đơn vị chuẩn: $\\text{kg/m}^3$ (ngoài ra có $\\text{g/cm}^3$; $1\\text{ g/cm}^3 = 1000\\text{ kg/m}^3$).</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Áp suất trên một bề mặt & Áp suất chất lỏng</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li>Áp suất chất rắn: $p = \\frac{F}{S}$ (đơn vị Paxcan: $\\text{Pa}$, $1\\text{ Pa} = 1\\text{ N/m}^2$).</li>
+              <li>Áp suất chất lỏng ở độ sâu $h$: $p = d \\cdot h$ (với $d$ là trọng lượng riêng của chất lỏng, đơn vị $\\text{N/m}^3$).</li>
+            </ul>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Một khối sắt có thể tích $0,02\\text{ m}^3$ và khối lượng $156\\text{ kg}$. Khối lượng riêng của sắt là:",
+            options: ["$7800\\text{ kg/m}^3$", "$780\\text{ kg/m}^3$", "$3,12\\text{ kg/m}^3$", "$78\\text{ kg/m}^3$"],
+            ans: 0,
+            exp: "Áp dụng công thức $D = \\frac{m}{V} = \\frac{156}{0,02} = 7800\\text{ kg/m}^3$."
+          },
+          {
+            q: "Tính áp suất của nước tác dụng lên một thợ lặn ở độ sâu $15\\text{ m}$ dưới mặt nước biển. Biết trọng lượng riêng của nước biển là $10300\\text{ N/m}^3$.",
+            options: ["$154500\\text{ Pa}$", "$15450\\text{ Pa}$", "$686,7\\text{ Pa}$", "$10315\\text{ Pa}$"],
+            ans: 0,
+            exp: "Áp suất chất lỏng $p = d \\cdot h = 10300 \\cdot 15 = 154500\\text{ Pa}$."
+          }
+        ],
+        essays: [
+          {
+            q: "Tại sao lưỡi dao, lưỡi kéo thường được mài thật sắc, còn dây đeo ba lô học sinh lại được làm bản to?",
+            guide: "Theo công thức $p = \\frac{F}{S}$: Lưỡi dao mài sắc để giảm diện tích bị ép $S$, giúp tăng áp suất $p$ để dễ cắt vật. Ngược lại, quai ba lô làm bản to để tăng diện tích tiếp xúc $S$ lên vai, giúp giảm áp suất $p$ để vai không bị đau."
+          }
+        ]
+      },
+      {
+        id: "ly8-b2",
+        grade: 8,
+        chapter: "Chương V. Điện",
+        title: "Bài 22 & 23: Tác dụng của dòng điện & Cường độ dòng điện, Hiệu điện thế",
+        author: "Nguyễn Chí Đại",
+        simType: "circuit",
+        simTitle: "Thí nghiệm ảo: Mạch điện đơn giản & Định luật Ohm mở đầu",
+        simDesc: "Điều chỉnh Hiệu điện thế $U$ và Điện trở $R$ của bóng đèn để quan sát độ sáng đèn và số chỉ Ampe kế $I$.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Cường độ dòng điện và Hiệu điện thế</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li><strong>Cường độ dòng điện ($I$):</strong> Đo bằng <strong>Ampe kế</strong> (mắc nối tiếp với vật cần đo). Đơn vị là Ampe ($\\text{A}$) hoặc miliampe ($\\text{mA}$, $1\\text{ A} = 1000\\text{ mA}$).</li>
+              <li><strong>Hiệu điện thế ($U$):</strong> Đo bằng <strong>Vôn kế</strong> (mắc song song với hai đầu vật cần đo). Đơn vị là Vôn ($\\text{V}$).</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Các tác dụng của dòng điện</h4>
+            <p class="text-sm">Dòng điện có 5 tác dụng chính: Tác dụng nhiệt, tác dụng phát sáng, tác dụng hóa học, tác dụng sinh lí và tác dụng từ.</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Để đo cường độ dòng điện chạy qua một bóng đèn, ta phải mắc Ampe kế như thế nào?",
+            options: ["Mắc nối tiếp với bóng đèn", "Mắc song song với bóng đèn", "Mắc trực tiếp vào hai cực của nguồn điện", "Mắc tùy ý"],
+            ans: 0,
+            exp: "Ampe kế luôn được mắc nối tiếp với thiết bị cần đo sao cho dòng điện đi vào chốt dương (+) và đi ra chốt âm (-)."
+          }
+        ],
+        essays: [
+          {
+            q: "Đổi các đơn vị sau: a) $0,35\\text{ A} = ?\\text{ mA}$; b) $450\\text{ mA} = ?\\text{ A}$; c) $2,5\\text{ kV} = ?\\text{ V}$.",
+            guide: "a) $0,35\\text{ A} = 350\\text{ mA}$; b) $450\\text{ mA} = 0,45\\text{ A}$; c) $2,5\\text{ kV} = 2500\\text{ V}$."
+          }
+        ]
+      },
+
+      // -------------------- LỚP 9 --------------------
+      {
+        id: "ly9-b1",
+        grade: 9,
+        chapter: "Chương I. Năng lượng cơ học",
+        title: "Bài 2 & 3: Động năng, Thế năng và Cơ năng",
+        author: "Nguyễn Chí Đại",
+        simType: "energy",
+        simTitle: "Thí nghiệm ảo: Chuyển hóa giữa Thế năng và Động năng",
+        simDesc: "Thay đổi độ cao thả vật $h$ và khối lượng $m$ để tính Thế năng $W_t = 10mh$ và vận tốc chạm đất.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Động năng và Thế năng trọng trường</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li><strong>Động năng ($W_đ$):</strong> Năng lượng vật có được do chuyển động: $$W_đ = \\frac{1}{2} m v^2$$</li>
+              <li><strong>Thế năng trọng trường ($W_t$):</strong> Năng lượng vật có được khi ở độ cao $h$ so với mốc thế năng: $$W_t = P \\cdot h = 10 \\cdot m \\cdot h$$</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Cơ năng và Định luật bảo toàn cơ năng</h4>
+            <p class="text-sm">Tổng động năng và thế năng của vật gọi là <strong>cơ năng</strong>: $W = W_đ + W_t$ (đơn vị Jun: $\\text{J}$). Khi vật chuyển động chỉ chịu tác dụng của trọng lực (bỏ qua lực cản), cơ năng của vật được bảo toàn.</p>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Một vật có khối lượng $2\\text{ kg}$ đang chuyển động với tốc độ $4\\text{ m/s}$. Động năng của vật là:",
+            options: ["$8\\text{ J}$", "$16\\text{ J}$", "$32\\text{ J}$", "$4\\text{ J}$"],
+            ans: 1,
+            exp: "Áp dụng công thức $W_đ = \\frac{1}{2} m v^2 = \\frac{1}{2} \\cdot 2 \\cdot 4^2 = 16\\text{ J}$."
+          },
+          {
+            q: "Một quả bóng khối lượng $0,5\\text{ kg}$ được thả rơi tự do từ độ cao $10\\text{ m}$ xuống đất. Bỏ qua sức cản không khí, cơ năng của quả bóng trong quá trình rơi bằng:",
+            options: ["$50\\text{ J}$", "$5\\text{ J}$", "$100\\text{ J}$", "$25\\text{ J}$"],
+            ans: 0,
+            exp: "Tại vị trí thả (độ cao $10\\text{ m}$), động năng bằng $0$, cơ năng bằng thế năng cực đại: $W = W_t = 10 \\cdot m \\cdot h = 10 \\cdot 0,5 \\cdot 10 = 50\\text{ J}$."
+          }
+        ],
+        essays: [
+          {
+            q: "Một viên bi khối lượng $200\\text{ g}$ được thả rơi không vận tốc đầu từ độ cao $5\\text{ m}$ so với mặt đất. Bỏ qua lực cản không khí, tính vận tốc của viên bi ngay trước khi chạm đất.",
+            guide: "Đổi $m = 200\\text{ g} = 0,2\\text{ kg}$. Cơ năng ban đầu: $W = W_t = 10 \\cdot 0,2 \\cdot 5 = 10\\text{ J}$. Khi chạm đất ($h = 0$), toàn bộ thế năng chuyển hóa thành động năng: $W_đ = \\frac{1}{2} m v^2 = 10 \\Rightarrow v = \\sqrt{\\frac{2 \\cdot 10}{0,2}} = \\sqrt{100} = 10\\text{ m/s}$."
+          }
+        ]
+      },
+      {
+        id: "ly9-b2",
+        grade: 9,
+        chapter: "Chương II. Ánh sáng (Khúc xạ & Thấu kính)",
+        title: "Bài 5 & 8: Khúc xạ ánh sáng và Thấu kính hội tụ",
+        author: "Nguyễn Chí Đại",
+        simType: "lens",
+        simTitle: "Thí nghiệm ảo: Sự tạo ảnh của vật qua Thấu kính hội tụ",
+        simDesc: "Kéo thanh trượt thay đổi khoảng cách từ vật đến thấu kính $d$ (so với tiêu cự $f = 10\\text{ cm}$) để quan sát ảnh thật / ảnh ảo.",
+        theory: `
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-100">
+            <h4 class="font-bold text-blue-900 mb-1">1. Hiện tượng khúc xạ ánh sáng</h4>
+            <p class="text-sm">Hiện tượng tia sáng truyền từ môi trường trong suốt này sang môi trường trong suốt khác bị gãy khúc tại mặt phân cách giữa hai môi trường gọi là <strong>hiện tượng khúc xạ ánh sáng</strong>. Khi ánh sáng truyền từ không khí sang nước, góc khúc xạ nhỏ hơn góc tới ($r < i$).</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 class="font-bold text-slate-900 mb-1">2. Đặc điểm ảnh tạo bởi Thấu kính hội tụ (tiêu cự $f$)</h4>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li>Vật đặt ngoài khoảng tiêu cự ($d > f$): Cho <strong>ảnh thật</strong>, ngược chiều với vật (nếu $d > 2f$ ảnh nhỏ hơn vật; nếu $f < d < 2f$ ảnh lớn hơn vật).</li>
+              <li>Vật đặt trong khoảng tiêu cự ($d < f$): Cho <strong>ảnh ảo</strong>, cùng chiều và lớn hơn vật.</li>
+            </ul>
+          </div>
+        `,
+        mcqs: [
+          {
+            q: "Đặt một vật sáng vuông góc với trục chính của một thấu kính hội tụ có tiêu cự $f = 12\\text{ cm}$, cách thấu kính một khoảng $d = 8\\text{ cm}$. Ảnh thu được có đặc điểm gì?",
+            options: ["Ảnh thật, ngược chiều, lớn hơn vật", "Ảnh ảo, cùng chiều, lớn hơn vật", "Ảnh thật, ngược chiều, nhỏ hơn vật", "Ảnh ảo, cùng chiều, nhỏ hơn vật"],
+            ans: 1,
+            exp: "Vì khoảng cách từ vật đến thấu kính $d = 8\\text{ cm} < f = 12\\text{ cm}$ (vật nằm trong khoảng tiêu cự) nên thấu kính hội tụ cho ảnh ảo, cùng chiều và lớn hơn vật."
+          }
+        ],
+        essays: [
+          {
+            q: "Nêu quy tắc vẽ đường truyền của 3 tia sáng đặc biệt qua thấu kính hội tụ.",
+            guide: "1) Tia tới đi qua quang tâm $O$ thì tia ló tiếp tục truyền thẳng theo phương của tia tới. 2) Tia tới song song với trục chính thì tia ló đi qua tiêu điểm ảnh chính $F'$. 3) Tia tới đi qua tiêu điểm vật chính $F$ thì tia ló song song với trục chính."
+          }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // APPLICATION STATE
+    // =========================================================================
+    let currentGrade = 6;
+    let currentLessonId = "ly6-b1";
+    let currentLessonSubtab = "theory";
+    let currentTeacherTab = "upload";
+    let uploadMode = "mcq"; // 'mcq' | 'lesson'
+    let parsedWordData = null;
+
+    // Cloud synced collections
+    let cloudLessons = [];
+    let cloudMcqs = [];
+    let allSubmissions = [];
+
+    // Student quiz answers state
+    let userQuizAnswers = {};
+    let isQuizSubmitted = false;
+
+    // =========================================================================
+    // TOAST NOTIFICATION HELPER
+    // =========================================================================
+    window.showToast = function (message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const colors = {
+        success: "bg-emerald-600 text-white",
+        error: "bg-rose-600 text-white",
+        warning: "bg-amber-500 text-slate-950",
+        info: "bg-slate-900 text-white"
+      };
+      const el = document.createElement("div");
+      el.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-xl text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 transition-all transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      el.innerHTML = `<span>${message}</span>`;
+      container.appendChild(el);
+      requestAnimationFrame(() => {
+        el.classList.remove("translate-y-2", "opacity-0");
+      });
+      setTimeout(() => {
+        el.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => el.remove(), 300);
+      }, 3800);
+    };
+
+    // =========================================================================
+    // KATEX FORMULA NORMALIZATION & RENDERING
+    // =========================================================================
+    function renderMathSafe(element) {
+      if (!element) return;
+      if (window.renderMathInElement) {
+        try {
+          window.renderMathInElement(element, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false },
+              { left: "\\(", right: "\\)", display: false },
+              { left: "\\[", right: "\\]", display: true }
+            ],
+            throwOnError: false
+          });
+        } catch (err) {
+          console.warn("KaTeX render warning:", err);
+        }
+      }
+    }
+
+    // =========================================================================
+    // MERGE BASE CURRICULUM + FIRESTORE CLOUD DATA
+    // =========================================================================
+    function getMergedCurriculum() {
+      // Clone base lessons
+      const merged = BASE_CURRICULUM.map((lesson) => ({
+        ...lesson,
+        mcqs: [...lesson.mcqs],
+        essays: [...lesson.essays]
+      }));
+
+      // Append cloud-created lessons
+      cloudLessons.forEach((cl) => {
+        merged.push({
+          id: cl.id,
+          grade: Number(cl.grade),
+          chapter: cl.chapter || "Chương bổ sung",
+          title: cl.title,
+          author: cl.authorEmail ? `GV: ${cl.authorEmail}` : "Tổ Vật Lý",
+          simType: "ruler",
+          simTitle: "Thí nghiệm minh họa trực quan",
+          simDesc: "Kéo thanh trượt để quan sát số liệu đo lường.",
+          theory: cl.theoryHtml || `<p>${cl.theoryText || ""}</p>`,
+          mcqs: Array.isArray(cl.mcqs) ? [...cl.mcqs] : [],
+          essays: Array.isArray(cl.essays) ? [...cl.essays] : [],
+          isCloud: true
+        });
+      });
+
+      // Append cloud custom MCQs to matching lessons
+      cloudMcqs.forEach((item) => {
+        const target = merged.find((l) => l.id === item.lessonId);
+        if (target && Array.isArray(item.questions)) {
+          item.questions.forEach((q) => {
+            target.mcqs.push({
+              ...q,
+              addedBy: item.authorEmail || "Giáo viên"
+            });
+          });
+        }
+      });
+
+      return merged;
+    }
+
+    // =========================================================================
+    // STUDENT IDENTITY (LOCALSTORAGE)
+    // =========================================================================
+    function getStudentIdentity() {
+      try {
+        const raw = localStorage.getItem("vatly_thcs_student");
+        return raw ? JSON.parse(raw) : { name: "", className: "" };
+      } catch {
+        return { name: "", className: "" };
+      }
+    }
+
+    function updateStudentIdentityUI() {
+      const info = getStudentIdentity();
+      const hasInfo = info.name && info.className;
+
+      const headerText = document.getElementById("header-student-text");
+      const sidebarName = document.getElementById("sidebar-student-name");
+      const sidebarClass = document.getElementById("sidebar-student-class");
+      const quizStatus = document.getElementById("quiz-identity-status");
+
+      if (hasInfo) {
+        headerText.textContent = `${info.name} (${info.className})`;
+        sidebarName.textContent = info.name;
+        sidebarClass.textContent = `Lớp: ${info.className}`;
+        quizStatus.innerHTML = `Học sinh: <strong class="text-slate-900">${info.name}</strong> — Lớp: <strong class="text-blue-700">${info.className}</strong> (Kết quả sẽ được lưu tự động khi nộp bài).`;
+      } else {
+        headerText.textContent = "Chưa nhập tên HS";
+        sidebarName.textContent = "Chưa khai báo họ tên";
+        sidebarClass.textContent = "Bấm nút bên cạnh để nhập";
+        quizStatus.textContent = "Vui lòng nhập Họ tên và Lớp trước khi nộp bài để hệ thống ghi nhận kết quả.";
+      }
+    }
+
+    window.openStudentInfoModal = function () {
+      const info = getStudentIdentity();
+      document.getElementById("modal-student-name").value = info.name || "";
+      document.getElementById("modal-student-class").value = info.className || "";
+      const modal = document.getElementById("student-info-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeStudentInfoModal = function () {
+      const modal = document.getElementById("student-info-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    window.quickSetClass = function (cls) {
+      document.getElementById("modal-student-class").value = cls;
+    };
+
+    window.saveStudentIdentity = function () {
+      const name = document.getElementById("modal-student-name").value.trim();
+      const className = document.getElementById("modal-student-class").value.trim().toUpperCase().replace(/\s+/g, "");
+
+      if (!name || !className) {
+        showToast("Vui lòng nhập đầy đủ Họ tên và Lớp học của em!", "warning");
+        return;
+      }
+
+      localStorage.setItem("vatly_thcs_student", JSON.stringify({ name, className }));
+      updateStudentIdentityUI();
+      closeStudentInfoModal();
+      showToast(`Đã lưu thông tin: ${name} - Lớp ${className}`, "success");
+    };
+
+    // =========================================================================
+    // NAVIGATION & LESSON RENDERING
+    // =========================================================================
+    window.selectGrade = function (grade) {
+      currentGrade = Number(grade);
+
+      // Update active button style
+      document.querySelectorAll(".grade-tab").forEach((btn) => {
+        const g = Number(btn.dataset.grade);
+        if (g === currentGrade) {
+          btn.className = "grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-white text-blue-900 shadow";
+        } else {
+          btn.className = "grade-tab px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition whitespace-nowrap bg-white/10 text-blue-100 hover:bg-white/20";
+        }
+      });
+
+      const merged = getMergedCurriculum();
+      const gradeLessons = merged.filter((l) => l.grade === currentGrade);
+      if (gradeLessons.length > 0 && !gradeLessons.some((l) => l.id === currentLessonId)) {
+        currentLessonId = gradeLessons[0].id;
+      }
+
+      renderSidebar();
+      renderCurrentLesson();
+    };
+
+    function renderSidebar() {
+      const merged = getMergedCurriculum();
+      const gradeLessons = merged.filter((l) => l.grade === currentGrade);
+
+      document.getElementById("sidebar-grade-title").innerHTML = `
+        <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i>
+        <span>Chương trình Vật Lý ${currentGrade}</span>
+      `;
+      document.getElementById("lesson-count-badge").textContent = `${gradeLessons.length} bài`;
+
+      // Group by chapter
+      const chapters = {};
+      gradeLessons.forEach((lesson) => {
+        if (!chapters[lesson.chapter]) chapters[lesson.chapter] = [];
+        chapters[lesson.chapter].push(lesson);
+      });
+
+      const container = document.getElementById("chapter-list");
+      container.innerHTML = "";
+
+      Object.entries(chapters).forEach(([chapName, lessons]) => {
+        const chapDiv = document.createElement("div");
+        chapDiv.className = "space-y-1.5";
+        chapDiv.innerHTML = `<p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-2 pt-1">${chapName}</p>`;
+
+        lessons.forEach((lesson) => {
+          const isActive = lesson.id === currentLessonId;
+          const btn = document.createElement("button");
+          btn.onclick = () => {
+            currentLessonId = lesson.id;
+            userQuizAnswers = {};
+            isQuizSubmitted = false;
+            renderSidebar();
+            renderCurrentLesson();
+          };
+          btn.className = isActive
+            ? "w-full text-left p-3 rounded-xl bg-blue-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-start justify-between gap-2"
+            : "w-full text-left p-3 rounded-xl hover:bg-slate-100 text-slate-700 font-medium text-xs sm:text-sm transition flex items-start justify-between gap-2";
+
+          btn.innerHTML = `
+            <span class="leading-snug">${lesson.title}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded ${isActive ? "bg-white/20 text-white" : "bg-slate-200/70 text-slate-600"} shrink-0">
+              ${lesson.mcqs.length} câu
+            </span>
+          `;
+          chapDiv.appendChild(btn);
+        });
+
+        container.appendChild(chapDiv);
+      });
+
+      lucide.createIcons();
+    }
+
+    function renderCurrentLesson() {
+      const merged = getMergedCurriculum();
+      const lesson = merged.find((l) => l.id === currentLessonId) || merged[0];
+      if (!lesson) return;
+
+      document.getElementById("lesson-chapter-tag").textContent = lesson.chapter;
+      document.getElementById("lesson-author-tag").innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i> Biên soạn: ${lesson.author}`;
+      document.getElementById("lesson-title").textContent = lesson.title;
+      document.getElementById("quiz-count-pill").textContent = lesson.mcqs.length;
+
+      // Render Theory
+      const theoryEl = document.getElementById("theory-body");
+      theoryEl.innerHTML = lesson.theory;
+      renderMathSafe(theoryEl);
+
+      // Render Quiz
+      renderQuizQuestions(lesson);
+
+      // Render Essays
+      const essayEl = document.getElementById("essay-container");
+      if (lesson.essays && lesson.essays.length > 0) {
+        essayEl.innerHTML = lesson.essays
+          .map(
+            (es, idx) => `
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <p class="font-bold text-slate-900 text-sm">Bài tự luận ${idx + 1}: ${es.q}</p>
+            <details class="group">
+              <summary class="cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-700 select-none">
+                Xem hướng dẫn giải chi tiết
+              </summary>
+              <div class="mt-2 p-3.5 rounded-xl bg-white border border-blue-100 text-sm text-slate-700 leading-relaxed">
+                ${es.guide}
+              </div>
+            </details>
+          </div>
+        `
+          )
+          .join("");
+      } else {
+        essayEl.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">Bài học này hiện chưa có bài tập tự luận.</p>`;
+      }
+      renderMathSafe(essayEl);
+
+      // Setup Simulation
+      setupSimulationForLesson(lesson);
+
+      switchLessonTab(currentLessonSubtab);
+      lucide.createIcons();
+    }
+
+    window.switchLessonTab = function (tab) {
+      currentLessonSubtab = tab;
+      const tabs = ["theory", "simulation", "quiz", "essay"];
+      tabs.forEach((t) => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const panel = document.getElementById(`content-${t}`);
+        if (t === tab) {
+          btn.className = "lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-blue-600 text-white shadow-sm";
+          panel.classList.remove("hidden");
+        } else {
+          btn.className = "lesson-subtab flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+          panel.classList.add("hidden");
+        }
+      });
+
+      if (tab === "simulation") {
+        const merged = getMergedCurriculum();
+        const lesson = merged.find((l) => l.id === currentLessonId);
+        if (lesson) setupSimulationForLesson(lesson);
+      }
+    };
+
+    // =========================================================================
+    // INTERACTIVE HTML5 CANVAS SIMULATIONS
+    // =========================================================================
+    function setupSimulationForLesson(lesson) {
+      document.getElementById("sim-title").innerHTML = `<i data-lucide="flask-conical" class="w-5 h-5 text-blue-600"></i> <span>${lesson.simTitle}</span>`;
+      document.getElementById("sim-desc").textContent = lesson.simDesc;
+
+      const controls = document.getElementById("sim-controls");
+      const readout = document.getElementById("sim-readout");
+      const canvas = document.getElementById("physics-canvas");
+      const ctx = canvas.getContext("2d");
+
+      // High-DPI sizing
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = (rect.width || 600) * 2;
+      canvas.height = 560;
+      ctx.scale(2, 2);
+      const W = canvas.width / 2;
+      const H = canvas.height / 2;
+
+      const type = lesson.simType || "ruler";
+
+      if (type === "ruler") {
+        controls.innerHTML = `
+          <div class="sm:col-span-2">
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>Chiều dài thanh gỗ (cm):</span>
+              <span id="sim-val-1" class="text-blue-600">12.5 cm</span>
+            </label>
+            <input type="range" id="sim-slider-1" min="2" max="20" step="0.1" value="12.5" class="w-full accent-blue-600" />
+          </div>
+        `;
+        const draw = () => {
+          const len = parseFloat(document.getElementById("sim-slider-1").value);
+          document.getElementById("sim-val-1").textContent = `${len.toFixed(1)} cm`;
+          readout.innerHTML = `<span>Kết quả đo: <strong>${len.toFixed(1)} cm</strong> = <strong>${(len * 10).toFixed(0)} mm</strong></span><span>ĐCNN: 0,1 cm</span>`;
+
+          ctx.clearRect(0, 0, W, H);
+          const startX = 40;
+          const scale = Math.min((W - 80) / 22, 26);
+
+          // Wood block
+          ctx.fillStyle = "#d97706";
+          ctx.fillRect(startX, 60, len * scale, 45);
+          ctx.strokeStyle = "#92400e";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(startX, 60, len * scale, 45);
+
+          // Dashed sight line
+          ctx.setLineDash([5, 5]);
+          ctx.strokeStyle = "#ef4444";
+          ctx.beginPath();
+          ctx.moveTo(startX + len * scale, 50);
+          ctx.lineTo(startX + len * scale, 210);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Ruler body
+          ctx.fillStyle = "#fef08a";
+          ctx.fillRect(startX - 10, 125, 20 * scale + 20, 65);
+          ctx.strokeStyle = "#ca8a04";
+          ctx.strokeRect(startX - 10, 125, 20 * scale + 20, 65);
+
+          // Ruler ticks
+          ctx.fillStyle = "#1e293b";
+          ctx.font = "11px Inter";
+          ctx.textAlign = "center";
+          for (let mm = 0; mm <= 200; mm++) {
+            const x = startX + (mm / 10) * scale;
+            const isCm = mm % 10 === 0;
+            const isHalf = mm % 5 === 0;
+            const tickH = isCm ? 22 : isHalf ? 15 : 9;
+            ctx.beginPath();
+            ctx.moveTo(x, 125);
+            ctx.lineTo(x, 125 + tickH);
+            ctx.strokeStyle = "#1e293b";
+            ctx.lineWidth = isCm ? 1.5 : 0.8;
+            ctx.stroke();
+            if (isCm) {
+              ctx.fillText(mm / 10, x, 165);
+            }
+          }
+        };
+        document.getElementById("sim-slider-1").oninput = draw;
+        draw();
+      } else if (type === "spring") {
+        controls.innerHTML = `
+          <div class="sm:col-span-2">
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>Khối lượng quả nặng treo vào lò xo (kg):</span>
+              <span id="sim-val-1" class="text-blue-600">0.5 kg</span>
+            </label>
+            <input type="range" id="sim-slider-1" min="0" max="2.0" step="0.1" value="0.5" class="w-full accent-blue-600" />
+          </div>
+        `;
+        const draw = () => {
+          const m = parseFloat(document.getElementById("sim-slider-1").value);
+          const P = m * 10;
+          const stretch = m * 65;
+          document.getElementById("sim-val-1").textContent = `${m.toFixed(1)} kg`;
+          readout.innerHTML = `<span>Trọng lực P = 10·m = <strong>${P.toFixed(1)} N</strong></span><span>Độ giãn lò xo: <strong>${(m * 5).toFixed(1)} cm</strong></span>`;
+
+          ctx.clearRect(0, 0, W, H);
+          const cx = W / 2;
+          // Support ceiling
+          ctx.fillStyle = "#334155";
+          ctx.fillRect(cx - 80, 20, 160, 12);
+
+          // Spring zig-zag
+          const topY = 32;
+          const botY = 95 + stretch;
+          const coils = 12;
+          const stepY = (botY - topY) / coils;
+          ctx.beginPath();
+          ctx.moveTo(cx, topY);
+          for (let i = 1; i < coils; i++) {
+            const offsetX = i % 2 === 0 ? -16 : 16;
+            ctx.lineTo(cx + offsetX, topY + i * stepY);
+          }
+          ctx.lineTo(cx, botY);
+          ctx.strokeStyle = "#2563eb";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          // Weight block
+          if (m > 0) {
+            ctx.fillStyle = "#dc2626";
+            ctx.beginPath();
+            ctx.roundRect(cx - 28, botY, 56, 42, 8);
+            ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 12px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText(`${m.toFixed(1)} kg`, cx, botY + 25);
+          }
+        };
+        document.getElementById("sim-slider-1").oninput = draw;
+        draw();
+      } else if (type === "speed") {
+        controls.innerHTML = `
+          <div>
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>Tốc độ xe v (km/h):</span>
+              <span id="sim-val-1" class="text-blue-600">54 km/h</span>
+            </label>
+            <input type="range" id="sim-slider-1" min="18" max="108" step="18" value="54" class="w-full accent-blue-600" />
+          </div>
+          <div>
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>Thời gian di chuyển t (giờ):</span>
+              <span id="sim-val-2" class="text-blue-600">2.0 h</span>
+            </label>
+            <input type="range" id="sim-slider-2" min="0.5" max="4.0" step="0.5" value="2.0" class="w-full accent-blue-600" />
+          </div>
+        `;
+        const draw = () => {
+          const v = parseFloat(document.getElementById("sim-slider-1").value);
+          const t = parseFloat(document.getElementById("sim-slider-2").value);
+          const s = v * t;
+          document.getElementById("sim-val-1").textContent = `${v} km/h (${(v / 3.6).toFixed(1)} m/s)`;
+          document.getElementById("sim-val-2").textContent = `${t.toFixed(1)} h`;
+          readout.innerHTML = `<span>Quãng đường s = v·t = <strong>${s.toFixed(1)} km</strong></span><span>Tốc độ: <strong>${(v / 3.6).toFixed(1)} m/s</strong></span>`;
+
+          ctx.clearRect(0, 0, W, H);
+          // Road
+          ctx.fillStyle = "#475569";
+          ctx.fillRect(30, 170, W - 60, 40);
+          ctx.setLineDash([14, 10]);
+          ctx.strokeStyle = "#f8fafc";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(40, 190);
+          ctx.lineTo(W - 40, 190);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Car position proportional to s (max 432 km)
+          const progress = Math.min(s / 432, 1);
+          const carX = 45 + progress * (W - 150);
+
+          ctx.fillStyle = "#2563eb";
+          ctx.beginPath();
+          ctx.roundRect(carX, 130, 65, 32, 8);
+          ctx.fill();
+          ctx.fillStyle = "#0f172a";
+          ctx.beginPath();
+          ctx.arc(carX + 15, 165, 8, 0, Math.PI * 2);
+          ctx.arc(carX + 50, 165, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "#1e3a8a";
+          ctx.font = "bold 13px Inter";
+          ctx.fillText(`Quãng đường s = ${s.toFixed(1)} km`, 40, 70);
+        };
+        document.getElementById("sim-slider-1").oninput = draw;
+        document.getElementById("sim-slider-2").oninput = draw;
+        draw();
+      } else if (type === "reflection") {
+        controls.innerHTML = `
+          <div class="sm:col-span-2">
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>Góc tới i (độ):</span>
+              <span id="sim-val-1" class="text-blue-600">40°</span>
+            </label>
+            <input type="range" id="sim-slider-1" min="10" max="80" step="5" value="40" class="w-full accent-blue-600" />
+          </div>
+        `;
+        const draw = () => {
+          const deg = parseFloat(document.getElementById("sim-slider-1").value);
+          const rad = (deg * Math.PI) / 180;
+          document.getElementById("sim-val-1").textContent = `${deg}°`;
+          readout.innerHTML = `<span>Góc tới i = <strong>${deg}°</strong></span><span>Góc phản xạ i' = <strong>${deg}°</strong></span>`;
+
+          ctx.clearRect(0, 0, W, H);
+          const cx = W / 2;
+          const cy = 210;
+          const rayLen = 150;
+
+          // Mirror
+          ctx.strokeStyle = "#0284c7";
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(cx - 170, cy);
+          ctx.lineTo(cx + 170, cy);
+          ctx.stroke();
+
+          // Normal line
+          ctx.setLineDash([5, 5]);
+          ctx.strokeStyle = "#64748b";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx, cy - 165);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Incident ray
+          const ix = cx - rayLen * Math.sin(rad);
+          const iy = cy - rayLen * Math.cos(rad);
+          ctx.strokeStyle = "#ef4444";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(ix, iy);
+          ctx.lineTo(cx, cy);
+          ctx.stroke();
+
+          // Reflected ray
+          const rx = cx + rayLen * Math.sin(rad);
+          const ry = cy - rayLen * Math.cos(rad);
+          ctx.strokeStyle = "#16a34a";
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(rx, ry);
+          ctx.stroke();
+
+          ctx.fillStyle = "#0f172a";
+          ctx.font = "bold 12px Inter";
+          ctx.fillText(`i = ${deg}°`, cx - 45, cy - 60);
+          ctx.fillText(`i' = ${deg}°`, cx + 15, cy - 60);
+        };
+        document.getElementById("sim-slider-1").oninput = draw;
+        draw();
+      } else if (type === "pressure" || type === "energy" || type === "circuit" || type === "lens") {
+        // Unified interactive physical meter canvas for Grade 8 & 9 topics
+        controls.innerHTML = `
+          <div>
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>${type === "pressure" ? "Độ sâu h (m):" : type === "circuit" ? "Hiệu điện thế U (V):" : type === "energy" ? "Độ cao h (m):" : "Khoảng cách vật d (cm):"}</span>
+              <span id="sim-val-1" class="text-blue-600">10</span>
+            </label>
+            <input type="range" id="sim-slider-1" min="2" max="25" step="1" value="10" class="w-full accent-blue-600" />
+          </div>
+          <div>
+            <label class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <span>${type === "pressure" ? "Trọng lượng riêng d (N/m³):" : type === "circuit" ? "Điện trở đèn R (Ω):" : type === "energy" ? "Khối lượng m (kg):" : "Tiêu cự thấu kính f (cm):"}</span>
+              <span id="sim-val-2" class="text-blue-600">10</span>
+            </label>
+            <input type="range" id="sim-slider-2" min="5" max="20" step="1" value="10" class="w-full accent-blue-600" />
+          </div>
+        `;
+        const draw = () => {
+          const v1 = parseFloat(document.getElementById("sim-slider-1").value);
+          const v2 = parseFloat(document.getElementById("sim-slider-2").value);
+          document.getElementById("sim-val-1").textContent = v1;
+          document.getElementById("sim-val-2").textContent = v2;
+
+          ctx.clearRect(0, 0, W, H);
+
+          if (type === "pressure") {
+            const dLiquid = v2 * 1000;
+            const p = dLiquid * v1;
+            readout.innerHTML = `<span>Áp suất chất lỏng p = d·h = <strong>${p.toLocaleString()} Pa</strong></span><span>Trọng lượng riêng: <strong>${dLiquid.toLocaleString()} N/m³</strong></span>`;
+            ctx.fillStyle = "#bae6fd";
+            ctx.fillRect(80, 40, W - 160, 200);
+            const sensorY = 40 + (v1 / 25) * 180;
+            ctx.fillStyle = "#dc2626";
+            ctx.beginPath();
+            ctx.arc(W / 2, sensorY, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 13px Inter";
+            ctx.fillText(`Độ sâu h = ${v1} m → p = ${p.toLocaleString()} Pa`, 95, 30);
+          } else if (type === "circuit") {
+            const I = v1 / v2;
+            readout.innerHTML = `<span>Cường độ dòng điện I = U/R = <strong>${I.toFixed(2)} A</strong></span><span>Công suất tiêu thụ: <strong>${(v1 * I).toFixed(1)} W</strong></span>`;
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(100, 60, W - 200, 150);
+            // Bulb brightness
+            const alpha = Math.min(I / 3, 1);
+            ctx.fillStyle = `rgba(250, 204, 21, ${0.2 + alpha * 0.8})`;
+            ctx.beginPath();
+            ctx.arc(W / 2, 60, 26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 13px Inter";
+            ctx.textAlign = "center";
+            ctx.fillText(`Ampe kế: I = ${I.toFixed(2)} A`, W / 2, 240);
+          } else if (type === "energy") {
+            const Wt = 10 * v2 * v1;
+            readout.innerHTML = `<span>Thế năng cực đại Wt = 10·m·h = <strong>${Wt} J</strong></span><span>Vận tốc chạm đất: <strong>${Math.sqrt(20 * v1).toFixed(1)} m/s</strong></span>`;
+            const ballY = 220 - (v1 / 25) * 170;
+            ctx.fillStyle = "#64748b";
+            ctx.fillRect(60, 235, W - 120, 10);
+            ctx.fillStyle = "#2563eb";
+            ctx.beginPath();
+            ctx.arc(W / 2, ballY, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 13px Inter";
+            ctx.fillText(`Độ cao h = ${v1} m | Cơ năng W = ${Wt} J`, 80, 32);
+          } else {
+            // Lens simulation
+            const d = v1 * 2;
+            const f = v2;
+            const isVirtual = d < f;
+            readout.innerHTML = `<span>Vật cách TK: d = <strong>${d} cm</strong> | Tiêu cự f = <strong>${f} cm</strong></span><span>Tính chất: <strong>${isVirtual ? "Ảnh ảo, cùng chiều, lớn hơn vật" : "Ảnh thật, ngược chiều vật"}</strong></span>`;
+            const cx = W / 2;
+            const cy = 140;
+            ctx.strokeStyle = "#94a3b8";
+            ctx.beginPath();
+            ctx.moveTo(30, cy);
+            ctx.lineTo(W - 30, cy);
+            ctx.stroke();
+            // Converging lens
+            ctx.strokeStyle = "#0284c7";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, 40);
+            ctx.lineTo(cx, 240);
+            ctx.stroke();
+            // Object arrow
+            const objX = cx - d * 4;
+            ctx.strokeStyle = "#dc2626";
+            ctx.beginPath();
+            ctx.moveTo(objX, cy);
+            ctx.lineTo(objX, cy - 45);
+            ctx.stroke();
+            ctx.fillStyle = "#0f172a";
+            ctx.font = "bold 12px Inter";
+            ctx.fillText(`F (${f}cm)`, cx - f * 4, cy + 16);
+            ctx.fillText(`F' (${f}cm)`, cx + f * 4, cy + 16);
+          }
+        };
+        document.getElementById("sim-slider-1").oninput = draw;
+        document.getElementById("sim-slider-2").oninput = draw;
+        draw();
+      }
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // STUDENT QUIZ & SUBMISSION TO FIRESTORE
+    // =========================================================================
+    function renderQuizQuestions(lesson) {
+      const container = document.getElementById("quiz-questions-container");
+      const summaryBox = document.getElementById("quiz-result-summary");
+      const submitBtn = document.getElementById("btn-submit-quiz");
+      const resetBtn = document.getElementById("btn-reset-quiz");
+
+      summaryBox.classList.add("hidden");
+      submitBtn.classList.remove("hidden");
+      resetBtn.classList.add("hidden");
+
+      if (!lesson.mcqs || lesson.mcqs.length === 0) {
+        container.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Bài học này chưa có câu hỏi trắc nghiệm.</p>`;
+        submitBtn.classList.add("hidden");
+        return;
+      }
+
+      const letters = ["A", "B", "C", "D"];
+      container.innerHTML = lesson.mcqs
+        .map((item, qIdx) => {
+          const chosen = userQuizAnswers[qIdx];
+          return `
+            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3" id="quiz-card-${qIdx}">
+              <div class="flex items-start justify-between gap-2">
+                <p class="font-bold text-slate-900 text-sm leading-relaxed">
+                  <span class="text-blue-600">Câu ${qIdx + 1}:</span> ${item.q}
+                </p>
+                ${item.addedBy ? `<span class="text-[10px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 font-semibold shrink-0">GV bổ sung</span>` : ""}
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                ${item.options
+                  .map((opt, oIdx) => {
+                    let btnClass = "border-slate-200 bg-white hover:border-blue-400 text-slate-700";
+                    if (isQuizSubmitted) {
+                      if (oIdx === item.ans) {
+                        btnClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold";
+                      } else if (chosen === oIdx && chosen !== item.ans) {
+                        btnClass = "border-rose-500 bg-rose-50 text-rose-900 font-bold";
+                      } else {
+                        btnClass = "border-slate-200 bg-white opacity-60 text-slate-500";
+                      }
+                    } else if (chosen === oIdx) {
+                      btnClass = "border-blue-600 bg-blue-50 text-blue-900 font-bold ring-2 ring-blue-500/20";
+                    }
+
+                    return `
+                      <button type="button" onclick="selectQuizOption(${qIdx}, ${oIdx})" ${isQuizSubmitted ? "disabled" : ""} class="text-left p-3 rounded-xl border text-xs sm:text-sm transition flex items-start gap-2.5 ${btnClass}">
+                        <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">${letters[oIdx]}</span>
+                        <span class="pt-0.5">${opt}</span>
+                      </button>
+                    `;
+                  })
+                  .join("")}
+              </div>
+              ${
+                isQuizSubmitted
+                  ? `<div class="p-3 rounded-xl bg-blue-50/80 border border-blue-100 text-xs text-slate-700">
+                      <strong class="text-blue-800">Giải thích:</strong> ${item.exp || "Đáp án đúng là " + letters[item.ans]}
+                    </div>`
+                  : ""
+              }
+            </div>
+          `;
+        })
+        .join("");
+
+      renderMathSafe(container);
+    }
+
+    window.selectQuizOption = function (qIdx, oIdx) {
+      if (isQuizSubmitted) return;
+      userQuizAnswers[qIdx] = oIdx;
+      const merged = getMergedCurriculum();
+      const lesson = merged.find((l) => l.id === currentLessonId);
+      if (lesson) renderQuizQuestions(lesson);
+    };
+
+    window.submitQuiz = async function () {
+      const student = getStudentIdentity();
+      if (!student.name || !student.className) {
+        showToast("Em hãy nhập Họ tên và Lớp trước khi nộp bài nhé!", "warning");
+        openStudentInfoModal();
+        return;
+      }
+
+      const merged = getMergedCurriculum();
+      const lesson = merged.find((l) => l.id === currentLessonId);
+      if (!lesson || !lesson.mcqs.length) return;
+
+      const total = lesson.mcqs.length;
+      const answeredCount = Object.keys(userQuizAnswers).length;
+      if (answeredCount < total) {
+        showToast(`Em mới làm ${answeredCount}/${total} câu. Hãy hoàn thành hết các câu rồi nộp bài nhé!`, "warning");
+        return;
+      }
+
+      let correctCount = 0;
+      lesson.mcqs.forEach((item, idx) => {
+        if (userQuizAnswers[idx] === item.ans) correctCount++;
+      });
+
+      const score10 = Number(((correctCount / total) * 10).toFixed(2));
+      isQuizSubmitted = true;
+      renderQuizQuestions(lesson);
+
+      const submitBtn = document.getElementById("btn-submit-quiz");
+      const resetBtn = document.getElementById("btn-reset-quiz");
+      const summaryBox = document.getElementById("quiz-result-summary");
+
+      submitBtn.classList.add("hidden");
+      resetBtn.classList.remove("hidden");
+      summaryBox.classList.remove("hidden");
+      summaryBox.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 class="font-extrabold text-emerald-900 text-base">Đã nộp bài thành công!</h4>
+            <p class="text-xs sm:text-sm text-emerald-800 mt-0.5">
+              Học sinh: <strong>${student.name}</strong> — Lớp: <strong>${student.className}</strong>
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="text-2xl font-extrabold text-emerald-700">${score10} / 10 điểm</span>
+            <p class="text-xs text-emerald-600 font-semibold">Đúng ${correctCount}/${total} câu</p>
+          </div>
+        </div>
+      `;
+
+      // Save submission to Firestore (create-only permission for students)
+      try {
+        await addDoc(collection(db, "submissions"), {
+          studentName: student.name,
+          studentClass: student.className,
+          grade: lesson.grade,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          correctCount: correctCount,
+          totalQuestions: total,
+          score: score10,
+          submittedAt: serverTimestamp()
+        });
+        showToast("Kết quả của em đã được gửi về bảng điểm của Giáo viên!", "success");
+      } catch (err) {
+        console.error("Error saving submission:", err);
+        showToast("Đã chấm điểm tại máy (lỗi kết nối đám mây khi gửi bảng điểm).", "warning");
+      }
+    };
+
+    window.resetQuiz = function () {
+      userQuizAnswers = {};
+      isQuizSubmitted = false;
+      const merged = getMergedCurriculum();
+      const lesson = merged.find((l) => l.id === currentLessonId);
+      if (lesson) renderQuizQuestions(lesson);
+    };
+
+    // =========================================================================
+    // TEACHER AUTHENTICATION (FIREBASE AUTH)
+    // =========================================================================
+    window.handleTeacherPortalClick = function () {
+      if (auth.currentUser) {
+        enterTeacherDashboard();
+      } else {
+        const modal = document.getElementById("teacher-login-modal");
+        document.getElementById("teacher-login-error").classList.add("hidden");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    };
+
+    window.closeTeacherLoginModal = function () {
+      const modal = document.getElementById("teacher-login-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    window.submitTeacherLogin = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("teacher-email-input").value.trim();
+      const password = document.getElementById("teacher-password-input").value;
+      const errorEl = document.getElementById("teacher-login-error");
+      const btn = document.getElementById("btn-teacher-login-submit");
+
+      btn.disabled = true;
+      errorEl.classList.add("hidden");
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        closeTeacherLoginModal();
+        showToast("Đăng nhập Cổng Giáo Viên thành công!", "success");
+        enterTeacherDashboard();
+      } catch (err) {
+        console.error("Login failed:", err);
+        errorEl.textContent = "Sai email hoặc mật khẩu giáo viên. Vui lòng kiểm tra lại!";
+        errorEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    window.logoutTeacher = async function () {
+      await signOut(auth);
+      exitTeacherDashboard();
+      showToast("Đã đăng xuất khỏi Cổng Giáo Viên.", "info");
+    };
+
+    function enterTeacherDashboard() {
+      if (!auth.currentUser) return;
+      document.getElementById("student-view").classList.add("hidden");
+      document.getElementById("teacher-dashboard-view").classList.remove("hidden");
+      document.getElementById("teacher-logged-email").textContent = auth.currentUser.email;
+      populateUploadLessonDropdown();
+      renderCloudManageLists();
+      fetchSubmissionsForTeacher();
+    }
+
+    window.exitTeacherDashboard = function () {
+      document.getElementById("teacher-dashboard-view").classList.add("hidden");
+      document.getElementById("student-view").classList.remove("hidden");
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      const label = document.getElementById("teacher-portal-label");
+      if (user) {
+        label.textContent = "Quản trị GV";
+      } else {
+        label.textContent = "Cổng Giáo Viên";
+        document.getElementById("teacher-dashboard-view").classList.add("hidden");
+        document.getElementById("student-view").classList.remove("hidden");
+      }
+    });
+
+    // =========================================================================
+    // TEACHER DASHBOARD: TABS, WORD (.DOCX) PARSER & FIRESTORE SYNC
+    // =========================================================================
+    window.switchTeacherTab = function (tab) {
+      currentTeacherTab = tab;
+      ["upload", "manage", "stats"].forEach((t) => {
+        const btn = document.getElementById(`t-tab-${t}`);
+        const panel = document.getElementById(`teacher-panel-${t}`);
+        if (t === tab) {
+          btn.className = "teacher-tab flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition bg-blue-600 text-white shadow-sm";
+          panel.classList.remove("hidden");
+        } else {
+          btn.className = "teacher-tab flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition text-slate-600 hover:bg-slate-100";
+          panel.classList.add("hidden");
+        }
+      });
+
+      if (tab === "stats") fetchSubmissionsForTeacher();
+      if (tab === "manage") renderCloudManageLists();
+    };
+
+    window.setUploadMode = function (mode) {
+      uploadMode = mode;
+      const mcqBtn = document.getElementById("mode-btn-mcq");
+      const lessonBtn = document.getElementById("mode-btn-lesson");
+      const existingBox = document.getElementById("upload-existing-lesson-box");
+      const newBox = document.getElementById("upload-new-lesson-box");
+
+      if (mode === "mcq") {
+        mcqBtn.className = "p-2.5 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-800 text-xs font-bold text-center transition";
+        lessonBtn.className = "p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold text-center transition";
+        existingBox.classList.remove("hidden");
+        newBox.classList.add("hidden");
+      } else {
+        lessonBtn.className = "p-2.5 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-800 text-xs font-bold text-center transition";
+        mcqBtn.className = "p-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold text-center transition";
+        existingBox.classList.add("hidden");
+        newBox.classList.remove("hidden");
+      }
+      clearWordPreview();
+    };
+
+    window.populateUploadLessonDropdown = function () {
+      const grade = Number(document.getElementById("upload-grade").value);
+      const select = document.getElementById("upload-lesson-select");
+      const merged = getMergedCurriculum().filter((l) => l.grade === grade);
+      select.innerHTML = merged.map((l) => `<option value="${l.id}">${l.title}</option>`).join("");
+    };
+
+    window.toggleWordTemplateModal = function () {
+      const modal = document.getElementById("word-guide-modal");
+      modal.classList.toggle("hidden");
+      modal.classList.toggle("flex");
+    };
+
+    // Read .docx file using Mammoth.js
+    window.handleWordFileUpload = async function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById("word-file-name").textContent = file.name;
+      const previewArea = document.getElementById("word-preview-area");
+      const badge = document.getElementById("parsed-count-badge");
+      const saveBtn = document.getElementById("btn-publish-word");
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+
+        if (uploadMode === "mcq") {
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          const questions = parseMcqsFromRawText(result.value);
+          parsedWordData = { type: "mcq", questions };
+
+          if (questions.length === 0) {
+            badge.textContent = "0 câu nhận diện được";
+            previewArea.innerHTML = `<div class="p-4 rounded-xl bg-rose-50 text-rose-700 text-xs">Không tìm thấy câu hỏi đúng định dạng. Hãy kiểm tra lại mẫu <code>Câu 1: ... A. ... B. ... C. ... D. ... Đáp án: A</code></div>`;
+            saveBtn.disabled = true;
+            return;
+          }
+
+          badge.textContent = `Nhận diện ${questions.length} câu hỏi`;
+          const letters = ["A", "B", "C", "D"];
+          previewArea.innerHTML = questions
+            .map(
+              (q, i) => `
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <p class="font-bold text-slate-900 text-xs sm:text-sm">Câu ${i + 1}: ${q.q}</p>
+                <div class="grid grid-cols-2 gap-1 text-xs">
+                  ${q.options.map((o, idx) => `<div class="${idx === q.ans ? "text-emerald-700 font-bold" : "text-slate-600"}">${letters[idx]}. ${o}</div>`).join("")}
+                </div>
+                <p class="text-[11px] text-blue-600">Đáp án đúng: <strong>${letters[q.ans]}</strong> ${q.exp ? `• Giải thích: ${q.exp}` : ""}</p>
+              </div>
+            `
+            )
+            .join("");
+          renderMathSafe(previewArea);
+          saveBtn.disabled = false;
+        } else {
+          // New Lesson / Theory HTML conversion
+          const htmlResult = await mammoth.convertToHtml({ arrayBuffer });
+          const cleanHtml = `<div class="space-y-2 text-sm leading-relaxed">${htmlResult.value}</div>`;
+          parsedWordData = { type: "lesson", theoryHtml: cleanHtml };
+          badge.textContent = "Sẵn sàng đăng bài học";
+          previewArea.innerHTML = cleanHtml;
+          renderMathSafe(previewArea);
+          saveBtn.disabled = false;
+        }
+      } catch (err) {
+        console.error("Word parse error:", err);
+        showToast("Lỗi khi đọc tệp Word. Đảm bảo tệp có đuôi .docx hợp lệ!", "error");
+      }
+    };
+
+    // Parse MCQs from plain text extracted from Word
+    function parseMcqsFromRawText(rawText) {
+      const lines = rawText
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+
+      const questions = [];
+      let current = null;
+      const letterMap = { A: 0, B: 1, C: 2, D: 3 };
+
+      lines.forEach((line) => {
+        // Match "Câu 1:" or "Bài 1:"
+        const qMatch = line.match(/^(?:Câu|Bài)\s*\d+\s*[:.)]\s*(.+)$/i);
+        if (qMatch) {
+          if (current && current.options.length >= 2) questions.push(current);
+          current = { q: qMatch[1].trim(), options: [], ans: 0, exp: "" };
+          return;
+        }
+
+        if (!current) return;
+
+        // Match options A. B. C. D.
+        const optMatch = line.match(/^([A-D])\s*[.)]\s*(.+)$/i);
+        if (optMatch) {
+          current.options.push(optMatch[2].trim());
+          return;
+        }
+
+        // Match Answer line: "Đáp án: A"
+        const ansMatch = line.match(/^(?:Đáp án|ĐA|Answer)\s*[:.-]?\s*([A-D])/i);
+        if (ansMatch) {
+          const letter = ansMatch[1].toUpperCase();
+          if (letterMap[letter] !== undefined) current.ans = letterMap[letter];
+          return;
+        }
+
+        // Match Explanation line: "Giải thích: ..."
+        const expMatch = line.match(/^(?:Giải thích|Hướng dẫn|HD)\s*[:.-]\s*(.+)$/i);
+        if (expMatch) {
+          current.exp = expMatch[1].trim();
+          return;
+        }
+      });
+
+      if (current && current.options.length >= 2) {
+        questions.push(current);
+      }
+
+      return questions;
+    }
+
+    window.clearWordPreview = function () {
+      parsedWordData = null;
+      document.getElementById("word-file-input").value = "";
+      document.getElementById("word-file-name").textContent = "Bấm để chọn file .docx từ máy tính";
+      document.getElementById("parsed-count-badge").textContent = "Chưa tải file";
+      document.getElementById("btn-publish-word").disabled = true;
+      document.getElementById("word-preview-area").innerHTML = `
+        <div class="py-16 text-center text-slate-400">
+          <i data-lucide="file-search" class="w-12 h-12 mx-auto mb-2 opacity-40"></i>
+          <p class="font-medium">Chọn một tệp Word (.docx) ở cột bên trái để xem trước nội dung tại đây.</p>
+        </div>
+      `;
+      lucide.createIcons();
+    };
+
+    window.saveParsedContentToFirestore = async function () {
+      if (!auth.currentUser || !parsedWordData) return;
+      const btn = document.getElementById("btn-publish-word");
+      btn.disabled = true;
+
+      try {
+        const grade = Number(document.getElementById("upload-grade").value);
+        if (parsedWordData.type === "mcq") {
+          const lessonId = document.getElementById("upload-lesson-select").value;
+          const merged = getMergedCurriculum();
+          const targetLesson = merged.find((l) => l.id === lessonId);
+
+          await addDoc(collection(db, "custom_mcqs"), {
+            grade,
+            lessonId,
+            lessonTitle: targetLesson ? targetLesson.title : lessonId,
+            questions: parsedWordData.questions,
+            authorEmail: auth.currentUser.email,
+            createdAt: serverTimestamp()
+          });
+
+          showToast(`Đã lưu ${parsedWordData.questions.length} câu trắc nghiệm lên hệ thống!`, "success");
+        } else {
+          const chapter = document.getElementById("new-lesson-chapter").value.trim() || "Chương bổ sung";
+          const title = document.getElementById("new-lesson-title").value.trim();
+          if (!title) {
+            showToast("Vui lòng nhập Tên bài học mới!", "warning");
+            btn.disabled = false;
+            return;
+          }
+
+          await addDoc(collection(db, "lessons"), {
+            grade,
+            chapter,
+            title,
+            theoryHtml: parsedWordData.theoryHtml,
+            authorEmail: auth.currentUser.email,
+            createdAt: serverTimestamp()
+          });
+
+          showToast(`Đã tạo bài học "${title}" thành công!`, "success");
+        }
+
+        clearWordPreview();
+      } catch (err) {
+        console.error("Save to Firestore error:", err);
+        showToast("Lỗi lưu dữ liệu. Hãy kiểm tra Firestore Rules trên Firebase!", "error");
+        btn.disabled = false;
+      }
+    };
+
+    // =========================================================================
+    // MANAGE CLOUD LESSONS & MCQS
+    // =========================================================================
+    function renderCloudManageLists() {
+      const lessonList = document.getElementById("cloud-lessons-list");
+      const mcqList = document.getElementById("cloud-mcqs-list");
+      document.getElementById("cloud-lessons-count").textContent = cloudLessons.length;
+      document.getElementById("cloud-mcqs-count").textContent = cloudMcqs.length;
+
+      if (cloudLessons.length === 0) {
+        lessonList.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">Chưa có bài học bổ sung nào trên đám mây.</p>`;
+      } else {
+        lessonList.innerHTML = cloudLessons
+          .map(
+            (l) => `
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">Lớp ${l.grade}</span>
+                <p class="font-bold text-slate-800 text-xs sm:text-sm mt-1">${l.title}</p>
+                <p class="text-[11px] text-slate-500">Đăng bởi: ${l.authorEmail || "Giáo viên"}</p>
+              </div>
+              <button onclick="deleteCloudDoc('lessons', '${l.id}')" class="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition" title="Xóa bài học">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `
+          )
+          .join("");
+      }
+
+      if (cloudMcqs.length === 0) {
+        mcqList.innerHTML = `<p class="text-xs text-slate-400 text-center py-8">Chưa có bộ câu hỏi bổ sung nào trên đám mây.</p>`;
+      } else {
+        mcqList.innerHTML = cloudMcqs
+          .map(
+            (m) => `
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">Lớp ${m.grade} • +${(m.questions || []).length} câu</span>
+                <p class="font-bold text-slate-800 text-xs sm:text-sm mt-1">${m.lessonTitle || m.lessonId}</p>
+                <p class="text-[11px] text-slate-500">Đăng bởi: ${m.authorEmail || "Giáo viên"}</p>
+              </div>
+              <button onclick="deleteCloudDoc('custom_mcqs', '${m.id}')" class="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition" title="Xóa gói câu hỏi">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `
+          )
+          .join("");
+      }
+
+      lucide.createIcons();
+    }
+
+    window.deleteCloudDoc = async function (colName, docId) {
+      if (!auth.currentUser) return;
+      try {
+        await deleteDoc(doc(db, colName, docId));
+        showToast("Đã xóa nội dung khỏi hệ thống.", "info");
+      } catch (err) {
+        console.error("Delete error:", err);
+        showToast("Không thể xóa dữ liệu.", "error");
+      }
+    };
+
+    // =========================================================================
+    // TEACHER ANALYTICS: SUBMISSIONS BY CLASS & CSV EXPORT
+    // =========================================================================
+    window.fetchSubmissionsForTeacher = async function () {
+      if (!auth.currentUser) return;
+      try {
+        const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
+        const snap = await getDocs(q);
+        allSubmissions = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        populateStatsFilters();
+        renderSubmissionsAnalytics();
+      } catch (err) {
+        console.error("Fetch submissions error:", err);
+        // Fallback without orderBy if index not ready
+        const snap = await getDocs(collection(db, "submissions"));
+        allSubmissions = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        populateStatsFilters();
+        renderSubmissionsAnalytics();
+      }
+    };
+
+    function populateStatsFilters() {
+      const classSelect = document.getElementById("stats-filter-class");
+      const lessonSelect = document.getElementById("stats-filter-lesson");
+
+      const currentClass = classSelect.value;
+      const currentLesson = lessonSelect.value;
+
+      const uniqueClasses = [...new Set(allSubmissions.map((s) => s.studentClass).filter(Boolean))].sort();
+      classSelect.innerHTML =
+        `<option value="all">Tất cả các lớp (${uniqueClasses.length} lớp)</option>` +
+        uniqueClasses.map((c) => `<option value="${c}">Lớp ${c}</option>`).join("");
+      if (uniqueClasses.includes(currentClass)) classSelect.value = currentClass;
+
+      const uniqueLessons = [...new Map(allSubmissions.map((s) => [s.lessonId, s.lessonTitle])).entries()];
+      lessonSelect.innerHTML =
+        `<option value="all">Tất cả các bài học</option>` +
+        uniqueLessons.map(([id, title]) => `<option value="${id}">${title}</option>`).join("");
+      if (uniqueLessons.some(([id]) => id === currentLesson)) lessonSelect.value = currentLesson;
+    }
+
+    function getFilteredSubmissions() {
+      const gradeFilter = document.getElementById("stats-filter-grade").value;
+      const classFilter = document.getElementById("stats-filter-class").value;
+      const lessonFilter = document.getElementById("stats-filter-lesson").value;
+
+      return allSubmissions.filter((s) => {
+        if (gradeFilter !== "all" && String(s.grade) !== gradeFilter) return false;
+        if (classFilter !== "all" && s.studentClass !== classFilter) return false;
+        if (lessonFilter !== "all" && s.lessonId !== lessonFilter) return false;
+        return true;
+      });
+    }
+
+    window.renderSubmissionsAnalytics = function () {
+      const filtered = getFilteredSubmissions();
+      const total = filtered.length;
+      const uniqueStudents = new Set(filtered.map((s) => `${s.studentName.toLowerCase()}_${s.studentClass}`)).size;
+      const avgScore = total > 0 ? filtered.reduce((acc, s) => acc + Number(s.score || 0), 0) / total : 0;
+      const passCount = filtered.filter((s) => Number(s.score || 0) >= 5).length;
+      const passRate = total > 0 ? Math.round((passCount / total) * 100) : 0;
+
+      document.getElementById("stat-total-submissions").textContent = total;
+      document.getElementById("stat-unique-students").textContent = `${uniqueStudents} học sinh khác nhau`;
+      document.getElementById("stat-avg-score").textContent = avgScore.toFixed(1);
+      document.getElementById("stat-pass-rate").textContent = `${passRate}%`;
+
+      const tbody = document.getElementById("submissions-table-body");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400">Chưa có dữ liệu học sinh nộp bài phù hợp với bộ lọc.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map((s, idx) => {
+          const timeStr = s.submittedAt && s.submittedAt.toDate
+            ? s.submittedAt.toDate().toLocaleString("vi-VN")
+            : "Vừa xong";
+          const score = Number(s.score || 0);
+          const badgeColor = score >= 8 ? "bg-emerald-100 text-emerald-700" : score >= 5 ? "bg-blue-100 text-blue-700" : "bg-rose-100 text-rose-700";
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3 px-4 text-slate-500 font-medium">${idx + 1}</td>
+              <td class="py-3 px-4 font-bold text-slate-900">${s.studentName}</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-slate-100 font-bold text-xs text-slate-700">${s.studentClass}</span></td>
+              <td class="py-3 px-4 text-xs text-slate-600 max-w-xs truncate">${s.lessonTitle}</td>
+              <td class="py-3 px-4 font-semibold text-slate-700">${s.correctCount}/${s.totalQuestions}</td>
+              <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${badgeColor}">${score.toFixed(1)}</span></td>
+              <td class="py-3 px-4 text-xs text-slate-500">${timeStr}</td>
+            </tr>
+          `;
+        })
+        .join("");
+    };
+
+    window.exportSubmissionsCSV = function () {
+      const filtered = getFilteredSubmissions();
+      if (filtered.length === 0) {
+        showToast("Không có dữ liệu để xuất file Excel!", "warning");
+        return;
+      }
+
+      const headers = ["STT", "Họ và tên", "Lớp", "Khối", "Bài học", "Số câu đúng", "Tổng số câu", "Điểm (Thang 10)", "Thời gian nộp"];
+      const rows = filtered.map((s, i) => {
+        const timeStr = s.submittedAt && s.submittedAt.toDate ? s.submittedAt.toDate().toLocaleString("vi-VN") : "";
+        return [
+          i + 1,
+          `"${(s.studentName || "").replace(/"/g, '""')}"`,
+          `"${s.studentClass || ""}"`,
+          s.grade || "",
+          `"${(s.lessonTitle || "").replace(/"/g, '""')}"`,
+          s.correctCount || 0,
+          s.totalQuestions || 0,
+          s.score || 0,
+          `"${timeStr}"`
+        ].join(",");
+      });
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Bang_Diem_Vat_Ly_THCS_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast("Đã tải xuống bảng điểm Excel (.CSV)!", "success");
+    };
+
+    // =========================================================================
+    // REAL-TIME FIRESTORE LISTENERS (PUBLIC LESSONS & CUSTOM MCQS)
+    // =========================================================================
+    function initRealtimeSync() {
+      onSnapshot(
+        collection(db, "lessons"),
+        (snapshot) => {
+          cloudLessons = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+          renderSidebar();
+          renderCurrentLesson();
+          if (auth.currentUser) {
+            populateUploadLessonDropdown();
+            renderCloudManageLists();
+          }
+        },
+        (err) => {
+          console.warn("Firestore lessons listener:", err);
+        }
+      );
+
+      onSnapshot(
+        collection(db, "custom_mcqs"),
+        (snapshot) => {
+          cloudMcqs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+          renderSidebar();
+          renderCurrentLesson();
+          if (auth.currentUser) {
+            renderCloudManageLists();
+          }
+        },
+        (err) => {
+          console.warn("Firestore custom_mcqs listener:", err);
+        }
+      );
+    }
+
+    // =========================================================================
+    // BOOTSTRAP APPLICATION
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      updateStudentIdentityUI();
+      selectGrade(6);
+      setUploadMode("mcq");
+      switchTeacherTab("upload");
+      initRealtimeSync();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
